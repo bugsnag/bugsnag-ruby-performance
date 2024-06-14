@@ -1,0 +1,35 @@
+name: maze-runner
+
+on: ["push", "pull_request"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Ruby ${{ matrix.ruby }}
+    strategy:
+      matrix:
+        ruby:
+          - '3.0'
+          - '3.1'
+          - '3.2'
+          - '3.3'
+
+    env:
+      BUNDLE_GEMFILE: Gemfile-maze-runner
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Maze Runner dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install libcurl4-openssl-dev net-tools
+
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.3
+        bundler-cache: true
+
+    - run: bundle exec maze-runner --no-source
+      env:
+        RUBY_TEST_VERSION: ${{ matrix.ruby }}
