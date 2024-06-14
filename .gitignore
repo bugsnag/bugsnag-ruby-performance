@@ -12,3 +12,9 @@
 
 # ignore the gemfile to prevent testing against stale versions
 Gemfile.lock
+
+maze-runner.log
+maze_output
+temp-bugsnag-performance
+
+*.gem

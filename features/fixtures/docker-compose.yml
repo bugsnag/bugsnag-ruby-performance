@@ -1,0 +1,9 @@
+services:
+  basic:
+    build:
+      context: basic
+      args:
+        - RUBY_TEST_VERSION
+    environment:
+      - BUGSNAG_PERFORMANCE_API_KEY
+      - BUGSNAG_PERFORMANCE_ENDPOINT
