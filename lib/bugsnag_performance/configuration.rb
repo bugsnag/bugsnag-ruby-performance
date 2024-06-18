@@ -11,8 +11,13 @@ module BugsnagPerformance
     attr_writer :endpoint
 
     def initialize
-      @release_stage = "production"
+      @api_key = ENV["BUGSNAG_PERFORMANCE_API_KEY"]
+      @release_stage = ENV.fetch("BUGSNAG_PERFORMANCE_RELEASE_STAGE", "production")
       @use_managed_quota = true
+
+      if enabled_release_stages = ENV["BUGSNAG_PERFORMANCE_ENABLED_RELEASE_STAGES"]
+        @enabled_release_stages = enabled_release_stages.split(",").map(&:strip)
+      end
     end
 
     def endpoint

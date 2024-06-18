@@ -13,6 +13,14 @@ RSpec.describe BugsnagPerformance::Configuration do
 
       expect(subject.api_key).to eq(api_key)
     end
+
+    it "reads from the performance environment variable" do
+      api_key = "aacdef1234567890abcdef1234567890"
+
+      with_environment_variable("BUGSNAG_PERFORMANCE_API_KEY", api_key) do
+        expect(subject.api_key).to eq(api_key)
+      end
+    end
   end
 
   context "app version" do
@@ -41,6 +49,14 @@ RSpec.describe BugsnagPerformance::Configuration do
 
       expect(subject.release_stage).to eq(release_stage)
     end
+
+    it "reads from the performance environment variable" do
+      release_stage = "staging"
+
+      with_environment_variable("BUGSNAG_PERFORMANCE_RELEASE_STAGE", release_stage) do
+        expect(subject.release_stage).to eq(release_stage)
+      end
+    end
   end
 
   context "enabled release stages" do
@@ -54,6 +70,18 @@ RSpec.describe BugsnagPerformance::Configuration do
       subject.enabled_release_stages = enabled_release_stages
 
       expect(subject.enabled_release_stages).to eq(enabled_release_stages)
+    end
+
+    it "reads from the performance environment variable" do
+      with_environment_variable("BUGSNAG_PERFORMANCE_ENABLED_RELEASE_STAGES", "staging,qa") do
+        expect(subject.enabled_release_stages).to eq(["staging", "qa"])
+      end
+    end
+
+    it "strips whitespace from the performance environment variable" do
+      with_environment_variable("BUGSNAG_PERFORMANCE_ENABLED_RELEASE_STAGES", "  production,  staging ") do
+        expect(subject.enabled_release_stages).to eq(["production", "staging"])
+      end
     end
   end
 
