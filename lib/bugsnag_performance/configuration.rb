@@ -22,7 +22,7 @@ module BugsnagPerformance
 
     def endpoint
       case
-      when @endpoint
+      when defined?(@endpoint)
         # if a custom endpoint has been set then use it directly
         @endpoint
       when @api_key.nil?
