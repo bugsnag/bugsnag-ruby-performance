@@ -90,6 +90,13 @@ RSpec.describe BugsnagPerformance::Configuration do
       expect(subject.endpoint).to be_nil
     end
 
+    it "is nil if set to nil" do
+      subject.api_key = "1234567890abcdef1234567890abcdef"
+      subject.endpoint = nil
+
+      expect(subject.endpoint).to be_nil
+    end
+
     it "is the default URL if API key is set" do
       subject.api_key = "1234567890abcdef1234567890abcdef"
 
