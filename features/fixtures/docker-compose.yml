@@ -16,3 +16,5 @@ services:
     environment:
       - MAZE_RUNNER_API_KEY
       - MAZE_RUNNER_ENDPOINT
+      - BUGSNAG_API_KEY
+      - BUGSNAG_RELEASE_STAGE

@@ -9,3 +9,11 @@ Scenario: It picks up configuration from bugsnag errors configuration
   Then the reflection payload field "enabled_release_stages" is an array with 2 elements
   Then the reflection payload field "enabled_release_stages.0" equals "prodevelopment"
   Then the reflection payload field "enabled_release_stages.1" equals "production"
+
+Scenario: It picks up configuration from bugsnag errors' environment variables
+  Given I set environment variable "BUGSNAG_API_KEY" to "ab123456789012345678901234567890"
+  Given I set environment variable "BUGSNAG_RELEASE_STAGE" to "developroduction"
+  And I run the service "bugsnag-errors" with the command "bundle exec ruby environment-variables.rb"
+  And I wait to receive a reflection
+  Then the reflection payload field "api_key" equals "ab123456789012345678901234567890"
+  Then the reflection payload field "release_stage" equals "developroduction"
