@@ -24,7 +24,7 @@ module BugsnagPerformance
 
     def initialize(configuration)
       @configuration = configuration
-      @valid_configuration = BugsnagPerformance::Configuration.new
+      @valid_configuration = BugsnagPerformance::Configuration.new(BugsnagPerformance::NilErrorsConfiguration.new)
       @messages = []
     end
 

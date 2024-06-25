@@ -4,7 +4,7 @@ RSpec.describe BugsnagPerformance::ConfigurationValidator do
   subject { BugsnagPerformance::ConfigurationValidator }
 
   let(:configuration) do
-    BugsnagPerformance::Configuration.new.tap do |configuration|
+    BugsnagPerformance::Configuration.new(BugsnagPerformance::NilErrorsConfiguration.new).tap do |configuration|
       configuration.api_key = "abcdef1234567890abcdef1234567890"
     end
   end
@@ -18,7 +18,7 @@ RSpec.describe BugsnagPerformance::ConfigurationValidator do
   end
 
   context "API key" do
-    let(:configuration) { BugsnagPerformance::Configuration.new }
+    let(:configuration) { BugsnagPerformance::Configuration.new(BugsnagPerformance::NilErrorsConfiguration.new) }
 
     it "passes validation when set to a valid value" do
       configuration.api_key = "abcdef1234567890abcdef1234567890"
