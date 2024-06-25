@@ -17,3 +17,13 @@ Scenario: It picks up configuration from bugsnag errors' environment variables
   And I wait to receive a reflection
   Then the reflection payload field "api_key" equals "ab123456789012345678901234567890"
   Then the reflection payload field "release_stage" equals "developroduction"
+
+Scenario: It picks up configuration from performance environment variables over errors'
+  Given I set environment variable "BUGSNAG_API_KEY" to "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  Given I set environment variable "BUGSNAG_RELEASE_STAGE" to "development"
+  Given I set environment variable "BUGSNAG_PERFORMANCE_API_KEY" to "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+  Given I set environment variable "BUGSNAG_PERFORMANCE_RELEASE_STAGE" to "production"
+  And I run the service "bugsnag-errors" with the command "bundle exec ruby environment-variables.rb"
+  And I wait to receive a reflection
+  Then the reflection payload field "api_key" equals "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+  Then the reflection payload field "release_stage" equals "production"
