@@ -7,3 +7,12 @@ services:
     environment:
       - MAZE_RUNNER_API_KEY
       - MAZE_RUNNER_ENDPOINT
+
+  bugsnag-errors:
+    build:
+      context: bugsnag-errors
+      args:
+        - RUBY_TEST_VERSION
+    environment:
+      - MAZE_RUNNER_API_KEY
+      - MAZE_RUNNER_ENDPOINT
