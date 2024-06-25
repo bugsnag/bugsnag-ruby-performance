@@ -1,7 +1,7 @@
 require "uri"
 require "open-uri"
 
-uri = URI(ENV.fetch('BUGSNAG_PERFORMANCE_ENDPOINT'))
+uri = URI(ENV.fetch('MAZE_RUNNER_ENDPOINT'))
 uri.path = '/reflect'
 
 uri.read

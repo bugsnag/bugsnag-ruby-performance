@@ -5,5 +5,5 @@ services:
       args:
         - RUBY_TEST_VERSION
     environment:
-      - BUGSNAG_PERFORMANCE_API_KEY
-      - BUGSNAG_PERFORMANCE_ENDPOINT
+      - MAZE_RUNNER_API_KEY
+      - MAZE_RUNNER_ENDPOINT
