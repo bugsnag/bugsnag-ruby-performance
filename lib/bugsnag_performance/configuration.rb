@@ -10,13 +10,18 @@ module BugsnagPerformance
 
     attr_writer :endpoint
 
-    def initialize
-      @api_key = ENV["BUGSNAG_PERFORMANCE_API_KEY"]
-      @release_stage = ENV.fetch("BUGSNAG_PERFORMANCE_RELEASE_STAGE", "production")
+    def initialize(errors_configuration)
+      @api_key = fetch(errors_configuration, :api_key, env: "BUGSNAG_PERFORMANCE_API_KEY")
+      @app_version = fetch(errors_configuration, :app_version)
+      @release_stage = fetch(errors_configuration, :release_stage, env: "BUGSNAG_PERFORMANCE_RELEASE_STAGE", default: "production")
       @use_managed_quota = true
 
-      if enabled_release_stages = ENV["BUGSNAG_PERFORMANCE_ENABLED_RELEASE_STAGES"]
-        @enabled_release_stages = enabled_release_stages.split(",").map(&:strip)
+      @enabled_release_stages = fetch(errors_configuration, :enabled_release_stages, env: "BUGSNAG_PERFORMANCE_ENABLED_RELEASE_STAGES")
+
+      # transform enabled release stages into an array if we read its value from
+      # the environment
+      if @enabled_release_stages.is_a?(String)
+        @enabled_release_stages = @enabled_release_stages.split(",").map(&:strip)
       end
     end
 
@@ -31,6 +36,26 @@ module BugsnagPerformance
       else
         "https://#{@api_key}.otlp.bugsnag.com/v1/traces"
       end
+    end
+
+    private
+
+    def fetch(
+      errors_configuration,
+      name,
+      env: nil,
+      default: nil
+    )
+      if env
+        value = ENV[env]
+
+        return value unless value.nil?
+      end
+
+      value = errors_configuration.send(name)
+      return value unless value.nil?
+
+      default
     end
   end
 end
