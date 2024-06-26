@@ -17,6 +17,42 @@ RSpec.describe BugsnagPerformance::ConfigurationValidator do
     expect(result.configuration.api_key).to be("abcdef1234567890abcdef1234567890")
   end
 
+  context "open telemetry configure block" do
+    it "passes validation when set to a valid value" do
+      configuration_proc = proc { |c| }
+
+      configuration.configure_open_telemetry(&configuration_proc)
+      result = subject.validate(configuration)
+
+      expect(result.messages).to be_empty
+      expect(result.valid?).to be(true)
+      expect(result.configuration.open_telemetry_configure_block).to be(&configuration_proc)
+    end
+
+    it "fails validation when set to an invalid value" do
+      called = false
+
+      configuration.configure_open_telemetry { |a, b| called = true }
+      result = subject.validate(configuration)
+
+      expect(result.messages).to eq(["configure_open_telemetry requires a callable with an arity of 1"])
+      expect(result.valid?).to be(false)
+
+      result.configuration.open_telemetry_configure_block.call
+      expect(called).to be(false)
+    end
+
+    it "fails validation when set to an invalid type" do
+      configuration.configure_open_telemetry
+      result = subject.validate(configuration)
+
+      expect(result.messages).to eq(["configure_open_telemetry requires a callable with an arity of 1"])
+      expect(result.valid?).to be(false)
+      expect(result.configuration.open_telemetry_configure_block).not_to be_nil
+      expect { result.configuration.open_telemetry_configure_block.call }.not_to raise_error
+    end
+  end
+
   context "API key" do
     let(:configuration) { BugsnagPerformance::Configuration.new(BugsnagPerformance::NilErrorsConfiguration.new) }
 

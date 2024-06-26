@@ -9,6 +9,7 @@ module BugsnagPerformance
     def validate
       raise MissingApiKeyError.new if @configuration.api_key.nil?
 
+      validate_open_telemetry_configure_block
       validate_api_key
       validate_string(:app_version, optional: true)
       validate_string(:release_stage, optional: true)
@@ -26,6 +27,14 @@ module BugsnagPerformance
       @configuration = configuration
       @valid_configuration = BugsnagPerformance::Configuration.new(BugsnagPerformance::NilErrorsConfiguration.new)
       @messages = []
+    end
+
+    def validate_open_telemetry_configure_block
+      value = @configuration.open_telemetry_configure_block
+
+      return if value.respond_to?(:call) && value.arity == 1
+
+      @messages << "configure_open_telemetry requires a callable with an arity of 1"
     end
 
     def validate_api_key

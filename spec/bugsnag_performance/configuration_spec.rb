@@ -17,6 +17,24 @@ end
 RSpec.describe BugsnagPerformance::Configuration do
   subject { BugsnagPerformance::Configuration.new(BugsnagPerformance::NilErrorsConfiguration.new) }
 
+  context "configure_open_telemetry" do
+    it "is callable by default" do
+      expect(subject.open_telemetry_configure_block).to respond_to(:call)
+      expect { subject.open_telemetry_configure_block.call }.not_to raise_error
+    end
+
+    it "can be configured" do
+      block = spy('configure_open_telemetry block')
+
+      # passing '&block' here raises an error so we wrap it in another block
+      subject.configure_open_telemetry { block.call }
+      expect(block).not_to have_received(:call)
+
+      subject.open_telemetry_configure_block.call
+      expect(block).to have_received(:call)
+    end
+  end
+
   context "API key" do
     it "is nil by default" do
       expect(subject.api_key).to be_nil
