@@ -2,6 +2,8 @@
 
 module BugsnagPerformance
   class Configuration
+    attr_reader :open_telemetry_configure_block
+
     attr_accessor :api_key
     attr_accessor :app_version
     attr_accessor :release_stage
@@ -11,6 +13,8 @@ module BugsnagPerformance
     attr_writer :endpoint
 
     def initialize(errors_configuration)
+      @open_telemetry_configure_block = proc { |c| }
+
       @api_key = fetch(errors_configuration, :api_key, env: "BUGSNAG_PERFORMANCE_API_KEY")
       @app_version = fetch(errors_configuration, :app_version)
       @release_stage = fetch(errors_configuration, :release_stage, env: "BUGSNAG_PERFORMANCE_RELEASE_STAGE", default: "production")
@@ -36,6 +40,10 @@ module BugsnagPerformance
       else
         "https://#{@api_key}.otlp.bugsnag.com/v1/traces"
       end
+    end
+
+    def configure_open_telemetry(&open_telemetry_configure_block)
+      @open_telemetry_configure_block = open_telemetry_configure_block
     end
 
     private
