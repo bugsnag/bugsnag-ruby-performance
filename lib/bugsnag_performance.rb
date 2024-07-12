@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "net/http"
 require "concurrent-ruby"
 require "opentelemetry-sdk"
 
@@ -8,6 +9,7 @@ require_relative "bugsnag_performance/error"
 require_relative "bugsnag_performance/task"
 require_relative "bugsnag_performance/sampler"
 require_relative "bugsnag_performance/version"
+require_relative "bugsnag_performance/delivery"
 require_relative "bugsnag_performance/configuration"
 require_relative "bugsnag_performance/task_scheduler"
 require_relative "bugsnag_performance/configuration_validator"
