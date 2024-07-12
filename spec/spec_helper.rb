@@ -16,6 +16,14 @@ module Helpers
       ENV.delete(name)
     end
   end
+
+  def measure(&block)
+    before = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+    block.call
+
+    Process.clock_gettime(Process::CLOCK_MONOTONIC) - before
+  end
 end
 
 RSpec.configure do |config|
