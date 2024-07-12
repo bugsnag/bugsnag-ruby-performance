@@ -35,4 +35,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "opentelemetry-sdk", "~> 1.0"
 
   spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "webmock", "~> 3.23"
 end
