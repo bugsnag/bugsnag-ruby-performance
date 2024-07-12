@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
     end
   end
 
+  spec.add_dependency "concurrent-ruby", "~> 1.3"
   spec.add_dependency "opentelemetry-sdk", "~> 1.0"
 
   spec.add_development_dependency "rspec", "~> 3.0"
