@@ -104,7 +104,7 @@ RSpec.describe BugsnagPerformance::Task do
 
   context "#wait" do
     it "waits for the task to finish" do
-      subject.schedule(0.01)
+      subject.schedule(0.1)
       expect(callback).not_to have_received(:call)
 
       subject.wait
@@ -119,7 +119,7 @@ RSpec.describe BugsnagPerformance::Task do
     end
 
     it "does nothing if called after the task has finished" do
-      subject.schedule(0.01)
+      subject.schedule(0.1)
       expect(callback).not_to have_received(:call)
 
       subject.wait
