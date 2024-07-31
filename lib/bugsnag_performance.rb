@@ -2,6 +2,7 @@
 
 require "json"
 require "time"
+require "timeout"
 require "net/http"
 require "concurrent-ruby"
 require "opentelemetry-sdk"

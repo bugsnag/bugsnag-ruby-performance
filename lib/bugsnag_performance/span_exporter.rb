@@ -9,18 +9,21 @@ module BugsnagPerformance
       @sampling_header_encoder = sampling_header_encoder
     end
 
-    # TODO: handle 'timeout'
     def export(span_data, timeout: nil)
-      headers = { "Bugsnag-Span-Sampling" => @sampling_header_encoder.encode(span_data) }
-      body = JSON.generate(@payload_encoder.encode(span_data))
+      with_timeout(timeout) do
+        headers = { "Bugsnag-Span-Sampling" => @sampling_header_encoder.encode(span_data) }
+        body = JSON.generate(@payload_encoder.encode(span_data))
 
-      response = @delivery.deliver(headers, body)
+        response = @delivery.deliver(headers, body)
 
-      if response.sampling_probability
-        @probability_manager.probability = response.sampling_probability
+        if response.sampling_probability
+          @probability_manager.probability = response.sampling_probability
+        end
+
+        OpenTelemetry::SDK::Trace::Export::SUCCESS
       end
-
-      OpenTelemetry::SDK::Trace::Export::SUCCESS
+    rescue
+      OpenTelemetry::SDK::Trace::Export::FAILURE
     end
 
     def force_flush(timeout: nil)
@@ -29,6 +32,16 @@ module BugsnagPerformance
 
     def shutdown(timeout: nil)
       OpenTelemetry::SDK::Trace::Export::SUCCESS
+    end
+
+    private
+
+    def with_timeout(timeout, &block)
+      if timeout.nil?
+        block.call
+      else
+        Timeout::timeout(timeout) { block.call }
+      end
     end
   end
 end
