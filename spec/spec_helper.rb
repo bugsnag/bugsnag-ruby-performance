@@ -129,3 +129,17 @@ RSpec::Matchers.define :be_a_hex_trace_id do
   diffable
 end
 
+def truncate(maybe_string, max_length: 25)
+  string = maybe_string.is_a?(String) ? maybe_string : maybe_string.inspect
+
+  return string if string.length < max_length
+
+  case string[0]
+  when "{"
+    string[..max_length - 3] + "… }"
+  when "["
+    string[..max_length - 2] + "…]"
+  else
+    string[..max_length - 1] + "…"
+  end
+end
