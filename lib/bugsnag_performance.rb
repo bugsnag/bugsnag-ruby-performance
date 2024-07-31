@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "json"
 require "time"
 require "net/http"
 require "concurrent-ruby"
@@ -12,6 +13,7 @@ require_relative "bugsnag_performance/sampler"
 require_relative "bugsnag_performance/version"
 require_relative "bugsnag_performance/delivery"
 require_relative "bugsnag_performance/configuration"
+require_relative "bugsnag_performance/span_exporter"
 require_relative "bugsnag_performance/task_scheduler"
 require_relative "bugsnag_performance/payload_encoder"
 require_relative "bugsnag_performance/probability_fetcher"
