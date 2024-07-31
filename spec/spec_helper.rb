@@ -42,6 +42,48 @@ module Helpers
 
     Process.clock_gettime(Process::CLOCK_MONOTONIC) - before
   end
+
+  def make_span(**options)
+    parameters = {
+      name: "span",
+      kind: :internal,
+      status: OpenTelemetry::Trace::Status.ok,
+      parent_span_id: OpenTelemetry::Trace::INVALID_SPAN_ID,
+      total_recorded_attributes: 0,
+      total_recorded_events: 0,
+      total_recorded_links: 0,
+      start_timestamp: 123456789,
+      end_timestamp: 234567890,
+      attributes: { "bugsnag.sampling.p" => 1.0 },
+      resource: OpenTelemetry::SDK::Resources::Resource.create,
+      instrumentation_scope: OpenTelemetry::SDK::InstrumentationScope.new,
+      span_id: OpenTelemetry::Trace.generate_span_id,
+      trace_id: OpenTelemetry::Trace.generate_trace_id,
+      trace_flags: 0,
+      tracestate: OpenTelemetry::Trace::Tracestate.from_string(""),
+    }.merge(options)
+
+    OpenTelemetry::SDK::Trace::SpanData.new(
+      parameters[:name],
+      parameters[:kind],
+      parameters[:status],
+      parameters[:parent_span_id],
+      parameters[:total_recorded_attributes],
+      parameters[:total_recorded_events],
+      parameters[:total_recorded_links],
+      parameters[:start_timestamp],
+      parameters[:end_timestamp],
+      parameters[:attributes],
+      parameters[:links],
+      parameters[:events],
+      parameters[:resource],
+      parameters[:instrumentation_scope],
+      parameters[:span_id],
+      parameters[:trace_id],
+      parameters[:trace_flags],
+      parameters[:tracestate],
+    )
+  end
 end
 
 RSpec.configure do |config|
@@ -70,3 +112,20 @@ RSpec.configure do |config|
     WebMock.stub_request(:post, TRACES_URI)
   end
 end
+
+RSpec::Matchers.define :be_a_hex_span_id do
+  match do |actual|
+    actual != OpenTelemetry::Trace::INVALID_SPAN_ID && actual.match?(/\A[0-9A-Fa-f]{16}\z/)
+  end
+
+  diffable
+end
+
+RSpec::Matchers.define :be_a_hex_trace_id do
+  match do |actual|
+    actual != OpenTelemetry::Trace::INVALID_TRACE_ID && actual.match?(/\A[0-9A-Fa-f]{32}\z/)
+  end
+
+  diffable
+end
+
