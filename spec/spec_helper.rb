@@ -113,6 +113,23 @@ RSpec.configure do |config|
   end
 end
 
+def have_sent_trace(&matcher)
+  have_requested(:post, TRACES_URI).with do |request|
+    if matcher
+      body = JSON.parse(request.body)
+      spans = body["resourceSpans"].flat_map do |resource_span|
+        resource_span["scopeSpans"].flat_map { |scope_span| scope_span["spans"] }
+      end
+
+      matcher.call(body: body, headers: request.headers, spans: spans)
+
+      true
+    else
+      raise "no matcher provided to have_sent_trace (did you use { }?)"
+    end
+  end
+end
+
 RSpec::Matchers.define :be_a_hex_span_id do
   match do |actual|
     actual != OpenTelemetry::Trace::INVALID_SPAN_ID && actual.match?(/\A[0-9A-Fa-f]{16}\z/)
