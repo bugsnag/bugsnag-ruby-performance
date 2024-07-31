@@ -145,4 +145,17 @@ RSpec.describe BugsnagPerformance::SpanExporter do
       })
     }
   end
+
+  it "obeys the given timeout" do
+    elapsed = measure do
+      stub_request(:post, TRACES_URI).to_return do
+        sleep(1)
+      end
+
+      status = subject.export([make_span], timeout: 0.1)
+      expect(status).to be(OpenTelemetry::SDK::Trace::Export::FAILURE)
+    end
+
+    expect(elapsed).to be_within(0.1).of(0.1)
+  end
 end
