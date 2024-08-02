@@ -8,5 +8,6 @@ module BugsnagPerformance
     attr_accessor :app_version
     attr_accessor :release_stage
     attr_accessor :enabled_release_stages
+    attr_accessor :logger
   end
 end
