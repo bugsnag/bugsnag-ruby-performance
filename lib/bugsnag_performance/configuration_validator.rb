@@ -10,6 +10,7 @@ module BugsnagPerformance
       raise MissingApiKeyError.new if @configuration.api_key.nil?
 
       validate_open_telemetry_configure_block
+      validate_logger
       validate_api_key
       validate_string(:app_version, optional: true)
       validate_string(:release_stage, optional: true)
@@ -35,6 +36,16 @@ module BugsnagPerformance
       return if value.respond_to?(:call) && value.arity == 1
 
       @messages << "configure_open_telemetry requires a callable with an arity of 1"
+    end
+
+    def validate_logger
+      value = @configuration.logger
+
+      if value.is_a?(::Logger)
+        @valid_configuration.logger = value
+      else
+        @messages << "logger should be a ::Logger, got #{value.inspect}"
+      end
     end
 
     def validate_api_key
