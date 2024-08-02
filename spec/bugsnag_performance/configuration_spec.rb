@@ -2,11 +2,13 @@
 
 class FakeBugsnagErrorsConfiguration < BugsnagPerformance::NilErrorsConfiguration
   def initialize(
+    logger: nil,
     api_key: nil,
     app_version: nil,
     release_stage: nil,
     enabled_release_stages: nil
   )
+    @logger = logger
     @api_key = api_key
     @app_version = app_version
     @release_stage = release_stage
@@ -32,6 +34,22 @@ RSpec.describe BugsnagPerformance::Configuration do
 
       subject.open_telemetry_configure_block.call
       expect(block).to have_received(:call)
+    end
+  end
+
+  context "logger" do
+    it "is OpenTelemetry's logger by default" do
+      expect(subject.logger).to be(OpenTelemetry.logger)
+    end
+
+    it "reads from bugsnag errors if present" do
+      logger = ::Logger.new($stdout)
+
+      configuration = BugsnagPerformance::Configuration.new(
+        FakeBugsnagErrorsConfiguration.new(logger: logger)
+      )
+
+      expect(configuration.logger).to be(logger)
     end
   end
 
