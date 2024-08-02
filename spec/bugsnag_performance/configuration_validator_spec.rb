@@ -53,6 +53,31 @@ RSpec.describe BugsnagPerformance::ConfigurationValidator do
     end
   end
 
+  context "logger" do
+    it "passes validation when set to a valid value" do
+      logger = ::Logger.new($stdout)
+
+      configuration.logger = logger
+      result = subject.validate(configuration)
+
+      expect(result.messages).to be_empty
+      expect(result.valid?).to be(true)
+      expect(result.configuration.logger).to be(logger)
+    end
+
+    it "fails validation when set to an invalid type" do
+      logger = Object.new
+
+      configuration.logger = logger
+      result = subject.validate(configuration)
+
+      expect(result.messages.first).to match(/\Alogger should be a ::Logger, got #<Object:.+>\z/)
+      expect(result.messages.length).to be(1)
+      expect(result.valid?).to be(false)
+      expect(result.configuration.logger).to be(OpenTelemetry.logger)
+    end
+  end
+
   context "API key" do
     let(:configuration) { BugsnagPerformance::Configuration.new(BugsnagPerformance::NilErrorsConfiguration.new) }
 
