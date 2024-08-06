@@ -15,7 +15,7 @@ payload_encoder = BugsnagPerformance::PayloadEncoder.new
 header_encoder = BugsnagPerformance::SamplingHeaderEncoder.new
 
 batch_processor = OpenTelemetry::SDK::Trace::Export::BatchSpanProcessor.new(
-  BugsnagPerformance::SpanExporter.new(manager, delivery, payload_encoder, header_encoder)
+  BugsnagPerformance::SpanExporter.new(configuration.logger, manager, delivery, payload_encoder, header_encoder)
 )
 
 OpenTelemetry::SDK.configure do |otel_configurator|
