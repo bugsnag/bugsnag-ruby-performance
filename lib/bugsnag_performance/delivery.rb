@@ -17,7 +17,7 @@ module BugsnagPerformance
       )
 
       raw_response = OpenTelemetry::Common::Utilities.untraced do
-        Net::HTTP.post(@uri, body, headers) rescue nil
+        Net::HTTP.post(@uri, body, headers)
       end
 
       Response.new(raw_response)
