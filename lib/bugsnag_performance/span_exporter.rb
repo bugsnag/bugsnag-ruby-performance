@@ -2,7 +2,14 @@
 
 module BugsnagPerformance
   class SpanExporter
-    def initialize(probability_manager, delivery, payload_encoder, sampling_header_encoder)
+    def initialize(
+      logger,
+      probability_manager,
+      delivery,
+      payload_encoder,
+      sampling_header_encoder
+    )
+      @logger = logger
       @probability_manager = probability_manager
       @delivery = delivery
       @payload_encoder = payload_encoder
@@ -11,7 +18,15 @@ module BugsnagPerformance
 
     def export(span_data, timeout: nil)
       with_timeout(timeout) do
-        headers = { "Bugsnag-Span-Sampling" => @sampling_header_encoder.encode(span_data) }
+        headers = {}
+        sampling_header = @sampling_header_encoder.encode(span_data)
+
+        if sampling_header.nil?
+          @logger.warn("[BugsnagPerformance] One or more spans are missing the 'bugsnag.sampling.p' attribute. This trace will be sent as 'unmanaged'.")
+        else
+          headers["Bugsnag-Span-Sampling"] = sampling_header
+        end
+
         body = JSON.generate(@payload_encoder.encode(span_data))
 
         response = @delivery.deliver(headers, body)
@@ -22,7 +37,10 @@ module BugsnagPerformance
 
         OpenTelemetry::SDK::Trace::Export::SUCCESS
       end
-    rescue
+    rescue => exception
+      @logger.error("[BugsnagPerformance] Failed to deliver trace to BugSnag.")
+      @logger.error(exception)
+
       OpenTelemetry::SDK::Trace::Export::FAILURE
     end
 

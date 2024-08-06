@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 RSpec.describe BugsnagPerformance::SpanExporter do
-  subject { BugsnagPerformance::SpanExporter.new(probability_manager, delivery, payload_encoder, sampling_header_encoder) }
+  subject { BugsnagPerformance::SpanExporter.new(logger, probability_manager, delivery, payload_encoder, sampling_header_encoder) }
+
+  let(:logger) { Logger.new(logger_io, level: Logger::DEBUG) }
+  let(:logger_io) { StringIO.new(+"", "w+")}
+  let(:logger_output) { logger_io.tap(&:rewind).read }
 
   let(:probability_manager) { BugsnagPerformance::ProbabilityManager.new(probability_fetcher) }
   let(:probability_fetcher) { instance_double(BugsnagPerformance::ProbabilityFetcher, { on_new_probability: nil, stale_in: nil }) }
@@ -26,6 +30,7 @@ RSpec.describe BugsnagPerformance::SpanExporter do
       expect(headers["Bugsnag-Sent-At"]).to match(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\z/)
       expect(headers["Content-Type"]).to eq("application/json")
     }
+    expect(logger_output).to be_empty
   end
 
   it "updates the probability value from the response" do
@@ -37,6 +42,7 @@ RSpec.describe BugsnagPerformance::SpanExporter do
 
     expect(status).to be(OpenTelemetry::SDK::Trace::Export::SUCCESS)
     expect(probability_manager.probability).to be(0.5)
+    expect(logger_output).to be_empty
   end
 
   it "can deliver a single minimal span" do
@@ -59,6 +65,8 @@ RSpec.describe BugsnagPerformance::SpanExporter do
         "droppedLinksCount" => 0,
       })
     }
+
+    expect(logger_output).to be_empty
   end
 
   it "can deliver a single complex span" do
@@ -144,6 +152,8 @@ RSpec.describe BugsnagPerformance::SpanExporter do
         "droppedLinksCount" => 0,
       })
     }
+
+    expect(logger_output).to include("[BugsnagPerformance] One or more spans are missing the 'bugsnag.sampling.p' attribute. This trace will be sent as 'unmanaged'.")
   end
 
   it "obeys the given timeout" do
@@ -157,5 +167,7 @@ RSpec.describe BugsnagPerformance::SpanExporter do
     end
 
     expect(elapsed).to be_within(0.1).of(0.1)
+    expect(logger_output).to include("[BugsnagPerformance] Failed to deliver trace to BugSnag.")
+    expect(logger_output).to include("execution expired (Timeout::Error)")
   end
 end
