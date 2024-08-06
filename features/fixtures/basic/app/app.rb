@@ -9,7 +9,7 @@ configuration.endpoint = "#{ENV.fetch('MAZE_RUNNER_ENDPOINT')}/traces"
 
 delivery = BugsnagPerformance::Delivery.new(configuration)
 scheduler = BugsnagPerformance::TaskScheduler.new
-fetcher = BugsnagPerformance::ProbabilityFetcher.new(delivery, scheduler)
+fetcher = BugsnagPerformance::ProbabilityFetcher.new(configuration.logger, delivery, scheduler)
 manager = BugsnagPerformance::ProbabilityManager.new(fetcher)
 payload_encoder = BugsnagPerformance::PayloadEncoder.new
 header_encoder = BugsnagPerformance::SamplingHeaderEncoder.new

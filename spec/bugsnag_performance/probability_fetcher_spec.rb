@@ -31,9 +31,12 @@ end
 
 RSpec.describe BugsnagPerformance::ProbabilityFetcher do
   subject do
-    BugsnagPerformance::ProbabilityFetcher.new(delivery, task_scheduler)
+    BugsnagPerformance::ProbabilityFetcher.new(logger, delivery, task_scheduler)
   end
 
+  let(:logger) { Logger.new(logger_io, level: Logger::DEBUG) }
+  let(:logger_io) { StringIO.new(+"", "w+")}
+  let(:logger_output) { logger_io.tap(&:rewind).read }
   let(:delivery) { BugsnagPerformance::Delivery.new(configuration) }
 
   let(:configuration) do
@@ -64,6 +67,7 @@ RSpec.describe BugsnagPerformance::ProbabilityFetcher do
 
     task_scheduler.run!
     expect(fetched_probability).to be(0.1234)
+    expect(logger_output).to eq("")
   end
 
   it "continues making requests if the probability is not returned" do
@@ -85,6 +89,7 @@ RSpec.describe BugsnagPerformance::ProbabilityFetcher do
     thread.join
 
     expect(fetched_probability).to be(0.6)
+    expect(logger_output).to include("[BugsnagPerformance] Failed to retrieve a probability value from BugSnag. Retrying in 30 seconds.")
   end
 
   it "continues making requests if an invalid probability is returned" do
@@ -110,5 +115,6 @@ RSpec.describe BugsnagPerformance::ProbabilityFetcher do
     thread.join
 
     expect(fetched_probability).to be(0.99)
+    expect(logger_output).to include("[BugsnagPerformance] Failed to retrieve a probability value from BugSnag. Retrying in 30 seconds.")
   end
 end
