@@ -11,7 +11,8 @@ delivery = BugsnagPerformance::Delivery.new(configuration)
 scheduler = BugsnagPerformance::TaskScheduler.new
 fetcher = BugsnagPerformance::ProbabilityFetcher.new(configuration.logger, delivery, scheduler)
 manager = BugsnagPerformance::ProbabilityManager.new(fetcher)
-payload_encoder = BugsnagPerformance::PayloadEncoder.new
+sampler = BugsnagPerformance::Sampler.new(manager)
+payload_encoder = BugsnagPerformance::PayloadEncoder.new(sampler)
 header_encoder = BugsnagPerformance::SamplingHeaderEncoder.new
 
 batch_processor = OpenTelemetry::SDK::Trace::Export::BatchSpanProcessor.new(
@@ -29,7 +30,7 @@ OpenTelemetry::SDK.configure do |otel_configurator|
   })
 end
 
-OpenTelemetry.tracer_provider.sampler = BugsnagPerformance::Sampler.new(manager)
+OpenTelemetry.tracer_provider.sampler = sampler
 Tracer = OpenTelemetry.tracer_provider.tracer("maze tracer")
 
 5.times do |i|
