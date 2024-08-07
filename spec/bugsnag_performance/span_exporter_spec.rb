@@ -17,7 +17,8 @@ RSpec.describe BugsnagPerformance::SpanExporter do
     end
   end
 
-  let(:payload_encoder) { BugsnagPerformance::PayloadEncoder.new }
+  let(:sampler) { BugsnagPerformance::Sampler.new(probability_manager) }
+  let(:payload_encoder) { BugsnagPerformance::PayloadEncoder.new(sampler) }
   let(:sampling_header_encoder) { BugsnagPerformance::SamplingHeaderEncoder.new }
 
   it "sets the expected headers" do

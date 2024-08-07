@@ -36,6 +36,25 @@ module BugsnagPerformance
       )
     end
 
+    # @api private
+    def resample_span?(span)
+      probability = @probability_manager.probability
+
+      # sample all spans that are missing the p value attribute
+      return true if span.attributes.nil? || span.attributes["bugsnag.sampling.p"].nil?
+
+      # update the p value attribute if it was originally sampled with a larger
+      # probability than the current value
+      if span.attributes["bugsnag.sampling.p"] > probability
+        span.attributes["bugsnag.sampling.p"] = probability
+      end
+
+      p_value = scale_probability(span.attributes["bugsnag.sampling.p"])
+      r_value = trace_id_to_sampling_rate(span.trace_id)
+
+      p_value >= r_value
+    end
+
     private
 
     def trace_id_to_sampling_rate(trace_id)
