@@ -17,11 +17,8 @@ module BugsnagPerformance
       #       in inconsistent data
       probability = @probability_manager.probability
 
-      p_value = scale_probability(probability)
-      r_value = trace_id_to_sampling_rate(trace_id)
-
       decision =
-        if p_value >= r_value
+        if sample_using_probability_and_trace_id?(probability, trace_id)
           OpenTelemetry::SDK::Trace::Samplers::Decision::RECORD_AND_SAMPLE
         else
           OpenTelemetry::SDK::Trace::Samplers::Decision::DROP
@@ -49,22 +46,19 @@ module BugsnagPerformance
         span.attributes["bugsnag.sampling.p"] = probability
       end
 
-      p_value = scale_probability(span.attributes["bugsnag.sampling.p"])
-      r_value = trace_id_to_sampling_rate(span.trace_id)
-
-      p_value >= r_value
+      sample_using_probability_and_trace_id?(span.attributes["bugsnag.sampling.p"], span.trace_id)
     end
 
     private
 
-    def trace_id_to_sampling_rate(trace_id)
-      # unpack the trace ID as a u64
-      trace_id.unpack1("@8Q>")
-    end
-
-    def scale_probability(probability)
+    def sample_using_probability_and_trace_id?(probability, trace_id)
       # scale the probability (stored as a float from 0-1) to a u64
-      (probability * PROBABILITY_SCALE_FACTOR).floor
+      p_value = (probability * PROBABILITY_SCALE_FACTOR).floor
+
+      # unpack the trace ID as a u64
+      r_value = trace_id.unpack1("@8Q>")
+
+      p_value >= r_value
     end
   end
 end
