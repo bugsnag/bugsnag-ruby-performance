@@ -14,9 +14,16 @@ module BugsnagPerformance
       @delivery = delivery
       @payload_encoder = payload_encoder
       @sampling_header_encoder = sampling_header_encoder
+      @disabled = false
+    end
+
+    def disable!
+      @disabled = true
     end
 
     def export(span_data, timeout: nil)
+      return OpenTelemetry::SDK::Trace::Export::SUCCESS if @disabled
+
       with_timeout(timeout) do
         headers = {}
         sampling_header = @sampling_header_encoder.encode(span_data)
