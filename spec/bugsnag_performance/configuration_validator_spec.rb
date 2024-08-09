@@ -19,14 +19,14 @@ RSpec.describe BugsnagPerformance::ConfigurationValidator do
 
   context "open telemetry configure block" do
     it "passes validation when set to a valid value" do
-      configuration_proc = proc { |c| }
+      configuration_proc = proc { |c| 1 + 1 }
 
       configuration.configure_open_telemetry(&configuration_proc)
       result = subject.validate(configuration)
 
       expect(result.messages).to be_empty
       expect(result.valid?).to be(true)
-      expect(result.configuration.open_telemetry_configure_block).to be(&configuration_proc)
+      expect(result.configuration.open_telemetry_configure_block.call).to eq(2)
     end
 
     it "fails validation when set to an invalid value" do
