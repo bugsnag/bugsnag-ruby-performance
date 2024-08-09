@@ -33,9 +33,11 @@ module BugsnagPerformance
     def validate_open_telemetry_configure_block
       value = @configuration.open_telemetry_configure_block
 
-      return if value.respond_to?(:call) && value.arity == 1
-
-      @messages << "configure_open_telemetry requires a callable with an arity of 1"
+      if value.respond_to?(:call) && value.arity == 1
+        @valid_configuration.configure_open_telemetry(&value)
+      else
+        @messages << "configure_open_telemetry requires a callable with an arity of 1"
+      end
     end
 
     def validate_logger
