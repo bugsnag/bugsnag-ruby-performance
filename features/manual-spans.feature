@@ -7,8 +7,9 @@ Scenario: It runs the basic app
   And the trace "Bugsnag-Span-Sampling" header equals "1.0:5"
 
   And the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "basic app"
+  And the trace payload field "resourceSpans.0.resource" string attribute "service.version" equals "1.22.333"
   And the trace payload field "resourceSpans.0.resource" integer attribute "device.id" equals 1
-  And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals "production"
+  And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals "staging"
 
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "test span 1"
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.kind" equals 1
@@ -59,3 +60,7 @@ Scenario: It runs the basic app
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.4.droppedLinksCount" equals 0
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.4.status.code" equals 1
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.4.status.message" equals ""
+
+Scenario: It does not export spans when the release stage is disabled
+  Given I run the service "basic" with the command "bundle exec ruby disabled-release-stage.rb"
+  Then I should receive no traces

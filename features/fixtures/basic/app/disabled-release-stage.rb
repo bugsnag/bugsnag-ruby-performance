@@ -10,7 +10,7 @@ BugsnagPerformance.configure do |configuration|
   configuration.endpoint = "#{ENV.fetch('MAZE_RUNNER_ENDPOINT')}/traces"
   configuration.app_version = "1.22.333"
   configuration.enabled_release_stages = ["production", "staging"]
-  configuration.release_stage = "staging"
+  configuration.release_stage = "development"
 
   configuration.configure_open_telemetry do |otel_configurator|
     otel_configurator.service_name = "basic app"
