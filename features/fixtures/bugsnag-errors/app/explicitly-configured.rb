@@ -10,16 +10,16 @@ Bugsnag.configure do |configuration|
   configuration.enabled_release_stages = ["prodevelopment", "production"]
 end
 
-configuration = BugsnagPerformance::Configuration.new(Bugsnag.configuration)
+BugsnagPerformance.configure do |configuration|
+  uri = URI(ENV.fetch('MAZE_RUNNER_ENDPOINT'))
+  uri.path = '/reflect'
 
-uri = URI(ENV.fetch('MAZE_RUNNER_ENDPOINT'))
-uri.path = '/reflect'
+  body = JSON.generate({
+    api_key: configuration.api_key,
+    app_version: configuration.app_version,
+    release_stage: configuration.release_stage,
+    enabled_release_stages: configuration.enabled_release_stages,
+  })
 
-body = JSON.generate({
-  api_key: configuration.api_key,
-  app_version: configuration.app_version,
-  release_stage: configuration.release_stage,
-  enabled_release_stages: configuration.enabled_release_stages,
-})
-
-Net::HTTP.post(uri, body, { 'content-type' => 'application/json' })
+  Net::HTTP.post(uri, body, { 'content-type' => 'application/json' })
+end
