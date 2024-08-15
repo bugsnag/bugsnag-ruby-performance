@@ -164,12 +164,24 @@ RSpec.describe BugsnagPerformance::SpanExporter do
       end
 
       status = subject.export([make_span], timeout: 0.1)
-      expect(status).to be(OpenTelemetry::SDK::Trace::Export::FAILURE)
+      expect(status).to be(OpenTelemetry::SDK::Trace::Export::TIMEOUT)
     end
 
     expect(elapsed).to be_within(0.1).of(0.1)
     expect(logger_output).to include("[BugsnagPerformance] Failed to deliver trace to BugSnag.")
     expect(logger_output).to include("execution expired (Timeout::Error)")
+  end
+
+  it "returns FAILURE when the request fails" do
+    stub_request(:post, TRACES_URI).to_return do
+      raise "oh no :("
+    end
+
+    status = subject.export([make_span])
+    expect(status).to be(OpenTelemetry::SDK::Trace::Export::FAILURE)
+
+    expect(logger_output).to include("[BugsnagPerformance] Failed to deliver trace to BugSnag.")
+    expect(logger_output).to include("oh no :( (RuntimeError)")
   end
 
   it "does not export spans when disabled" do

@@ -48,6 +48,8 @@ module BugsnagPerformance
       @logger.error("[BugsnagPerformance] Failed to deliver trace to BugSnag.")
       @logger.error(exception)
 
+      return OpenTelemetry::SDK::Trace::Export::TIMEOUT if exception.is_a?(Timeout::Error)
+
       OpenTelemetry::SDK::Trace::Export::FAILURE
     end
 
