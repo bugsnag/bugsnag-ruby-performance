@@ -1,4 +1,4 @@
 source "https://rubygems.org"
 
 gem "bugsnag"
-gem "bugsnag-performance", path: "/bugsnag-performance"
+gem "bugsnag_performance", path: "/bugsnag-performance"

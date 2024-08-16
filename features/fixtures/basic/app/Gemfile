@@ -8,4 +8,4 @@ unless otel_sdk_version.nil? || otel_sdk_version.empty? || otel_sdk_version == "
   gem "opentelemetry-sdk", otel_sdk_version
 end
 
-gem "bugsnag-performance", path: "/bugsnag-performance"
+gem "bugsnag_performance", path: "/bugsnag-performance"

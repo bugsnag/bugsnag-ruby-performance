@@ -3,7 +3,7 @@
 require_relative "lib/bugsnag_performance/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "bugsnag-performance"
+  spec.name = "bugsnag_performance"
   spec.version = BugsnagPerformance::VERSION
   spec.authors = ["BugSnag"]
   spec.email = ["notifiers@bugsnag.com"]
