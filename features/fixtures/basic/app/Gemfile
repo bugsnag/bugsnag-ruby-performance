@@ -1,3 +1,11 @@
 source "https://rubygems.org"
 
+otel_sdk_version = ENV["OPEN_TELEMETRY_SDK_TEST_VERSION"]
+
+# we use "automatic" as a shorthand for "rely on bundler automatically
+# installing the gem based on the requirement in bugsnag-performance's gemspec"
+unless otel_sdk_version.nil? || otel_sdk_version.empty? || otel_sdk_version == "automatic"
+  gem "opentelemetry-sdk", otel_sdk_version
+end
+
 gem "bugsnag-performance", path: "/bugsnag-performance"
