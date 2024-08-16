@@ -6,4 +6,8 @@ COPY temp-bugsnag-performance ./
 
 WORKDIR /usr/src/app
 COPY app/ /usr/src/app
+
+ARG OPEN_TELEMETRY_SDK_TEST_VERSION
+ENV OPEN_TELEMETRY_SDK_TEST_VERSION=$OPEN_TELEMETRY_SDK_TEST_VERSION
+
 RUN bundle install
