@@ -3,8 +3,8 @@
 module BugsnagPerformance
   class Configuration
     attr_reader :open_telemetry_configure_block
+    attr_reader :logger
 
-    attr_accessor :logger
     attr_accessor :api_key
     attr_accessor :app_version
     attr_accessor :release_stage
@@ -15,8 +15,8 @@ module BugsnagPerformance
 
     def initialize(errors_configuration)
       @open_telemetry_configure_block = proc { |c| }
+      self.logger = errors_configuration.logger || OpenTelemetry.logger
 
-      @logger = errors_configuration.logger || OpenTelemetry.logger
       @api_key = fetch(errors_configuration, :api_key, env: "BUGSNAG_PERFORMANCE_API_KEY")
       @app_version = fetch(errors_configuration, :app_version)
       @release_stage = fetch(errors_configuration, :release_stage, env: "BUGSNAG_PERFORMANCE_RELEASE_STAGE", default: "production")
@@ -29,6 +29,15 @@ module BugsnagPerformance
       if @enabled_release_stages.is_a?(String)
         @enabled_release_stages = @enabled_release_stages.split(",").map(&:strip)
       end
+    end
+
+    def logger=(logger)
+      @logger =
+        if logger.is_a?(LoggerWrapper)
+          logger
+        else
+          LoggerWrapper.new(logger)
+        end
     end
 
     def endpoint

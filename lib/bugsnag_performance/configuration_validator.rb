@@ -43,10 +43,10 @@ module BugsnagPerformance
     def validate_logger
       value = @configuration.logger
 
-      if value.is_a?(::Logger)
+      if value.is_a?(LoggerWrapper) && value.logger.is_a?(::Logger)
         @valid_configuration.logger = value
       else
-        @messages << "logger should be a ::Logger, got #{value.inspect}"
+        @messages << "logger should be a ::Logger, got #{value.logger.inspect}"
       end
     end
 
