@@ -53,7 +53,7 @@ module BugsnagPerformance
           end
         end
 
-        @logger.warn("[BugsnagPerformance] Failed to retrieve a probability value from BugSnag. Retrying in 30 seconds.")
+        @logger.warn("Failed to retrieve a probability value from BugSnag. Retrying in 30 seconds.")
         @logger.warn(exception) if exception
 
         # wait a bit before trying again

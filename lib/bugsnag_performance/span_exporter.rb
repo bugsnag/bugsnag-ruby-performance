@@ -29,7 +29,7 @@ module BugsnagPerformance
         sampling_header = @sampling_header_encoder.encode(span_data)
 
         if sampling_header.nil?
-          @logger.warn("[BugsnagPerformance] One or more spans are missing the 'bugsnag.sampling.p' attribute. This trace will be sent as 'unmanaged'.")
+          @logger.warn("One or more spans are missing the 'bugsnag.sampling.p' attribute. This trace will be sent as 'unmanaged'.")
         else
           headers["Bugsnag-Span-Sampling"] = sampling_header
         end
@@ -45,7 +45,7 @@ module BugsnagPerformance
         OpenTelemetry::SDK::Trace::Export::SUCCESS
       end
     rescue => exception
-      @logger.error("[BugsnagPerformance] Failed to deliver trace to BugSnag.")
+      @logger.error("Failed to deliver trace to BugSnag.")
       @logger.error(exception)
 
       return OpenTelemetry::SDK::Trace::Export::TIMEOUT if exception.is_a?(Timeout::Error)

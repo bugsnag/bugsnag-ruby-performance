@@ -39,7 +39,8 @@ RSpec.describe BugsnagPerformance::Configuration do
 
   context "logger" do
     it "is OpenTelemetry's logger by default" do
-      expect(subject.logger).to be(OpenTelemetry.logger)
+      expect(subject.logger).to be_a(BugsnagPerformance::LoggerWrapper)
+      expect(subject.logger.logger).to be(OpenTelemetry.logger)
     end
 
     it "reads from bugsnag errors if present" do
@@ -49,7 +50,18 @@ RSpec.describe BugsnagPerformance::Configuration do
         FakeBugsnagErrorsConfiguration.new(logger: logger)
       )
 
-      expect(configuration.logger).to be(logger)
+      expect(configuration.logger).to be_a(BugsnagPerformance::LoggerWrapper)
+      expect(configuration.logger.logger).to be(logger)
+    end
+
+    it "doesn't wrap a logger that has already been wrapped" do
+      logger = ::Logger.new($stdout)
+      logger_wrapper = BugsnagPerformance::LoggerWrapper.new(logger)
+
+      subject.logger = logger_wrapper
+
+      expect(subject.logger).to be(logger_wrapper)
+      expect(subject.logger.logger).to be(logger)
     end
   end
 

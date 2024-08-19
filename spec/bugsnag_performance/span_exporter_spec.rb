@@ -154,7 +154,7 @@ RSpec.describe BugsnagPerformance::SpanExporter do
       })
     }
 
-    expect(logger_output).to include("[BugsnagPerformance] One or more spans are missing the 'bugsnag.sampling.p' attribute. This trace will be sent as 'unmanaged'.")
+    expect(logger_output).to include("One or more spans are missing the 'bugsnag.sampling.p' attribute. This trace will be sent as 'unmanaged'.")
   end
 
   it "obeys the given timeout" do
@@ -168,7 +168,7 @@ RSpec.describe BugsnagPerformance::SpanExporter do
     end
 
     expect(elapsed).to be_within(0.1).of(0.1)
-    expect(logger_output).to include("[BugsnagPerformance] Failed to deliver trace to BugSnag.")
+    expect(logger_output).to include("Failed to deliver trace to BugSnag.")
     expect(logger_output).to include("execution expired (Timeout::Error)")
   end
 
@@ -180,7 +180,7 @@ RSpec.describe BugsnagPerformance::SpanExporter do
     status = subject.export([make_span])
     expect(status).to be(OpenTelemetry::SDK::Trace::Export::FAILURE)
 
-    expect(logger_output).to include("[BugsnagPerformance] Failed to deliver trace to BugSnag.")
+    expect(logger_output).to include("Failed to deliver trace to BugSnag.")
     expect(logger_output).to include("oh no :( (RuntimeError)")
   end
 

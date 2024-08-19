@@ -89,7 +89,7 @@ RSpec.describe BugsnagPerformance::ProbabilityFetcher do
     thread.join
 
     expect(fetched_probability).to be(0.6)
-    expect(logger_output).to include("[BugsnagPerformance] Failed to retrieve a probability value from BugSnag. Retrying in 30 seconds.")
+    expect(logger_output).to include("Failed to retrieve a probability value from BugSnag. Retrying in 30 seconds.")
   end
 
   it "continues making requests if an invalid probability is returned" do
@@ -115,6 +115,6 @@ RSpec.describe BugsnagPerformance::ProbabilityFetcher do
     thread.join
 
     expect(fetched_probability).to be(0.99)
-    expect(logger_output).to include("[BugsnagPerformance] Failed to retrieve a probability value from BugSnag. Retrying in 30 seconds.")
+    expect(logger_output).to include("Failed to retrieve a probability value from BugSnag. Retrying in 30 seconds.")
   end
 end

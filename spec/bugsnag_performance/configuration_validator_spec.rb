@@ -62,7 +62,8 @@ RSpec.describe BugsnagPerformance::ConfigurationValidator do
 
       expect(result.messages).to be_empty
       expect(result.valid?).to be(true)
-      expect(result.configuration.logger).to be(logger)
+      expect(result.configuration.logger).to be_a(BugsnagPerformance::LoggerWrapper)
+      expect(result.configuration.logger.logger).to be(logger)
     end
 
     it "fails validation when set to an invalid type" do
@@ -74,7 +75,8 @@ RSpec.describe BugsnagPerformance::ConfigurationValidator do
       expect(result.messages.first).to match(/\Alogger should be a ::Logger, got #<Object:.+>\z/)
       expect(result.messages.length).to be(1)
       expect(result.valid?).to be(false)
-      expect(result.configuration.logger).to be(OpenTelemetry.logger)
+      expect(result.configuration.logger).to be_a(BugsnagPerformance::LoggerWrapper)
+      expect(result.configuration.logger.logger).to be(OpenTelemetry.logger)
     end
   end
 
