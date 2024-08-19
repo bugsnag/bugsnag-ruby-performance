@@ -15,6 +15,7 @@ require_relative "bugsnag_performance/version"
 require_relative "bugsnag_performance/delivery"
 require_relative "bugsnag_performance/configuration"
 require_relative "bugsnag_performance/span_exporter"
+require_relative "bugsnag_performance/logger_wrapper"
 require_relative "bugsnag_performance/task_scheduler"
 require_relative "bugsnag_performance/payload_encoder"
 require_relative "bugsnag_performance/probability_fetcher"
@@ -49,7 +50,7 @@ module BugsnagPerformance
     )
 
     if configuration.enabled_release_stages && !configuration.enabled_release_stages.include?(configuration.release_stage)
-      configuration.logger.info("[BugsnagPerformance] Not exporting spans as the current release stage is not in the enabled release stages.")
+      configuration.logger.info("Not exporting spans as the current release stage is not in the enabled release stages.")
       exporter.disable!
     end
 
@@ -97,11 +98,11 @@ module BugsnagPerformance
 
   def self.log_validation_messages(logger, messages)
     if messages.length == 1
-      logger.warn("[BugsnagPerformance] Invalid configuration. #{messages.first}")
+      logger.warn("Invalid configuration. #{messages.first}")
     else
       logger.warn(
         <<~MESSAGE
-          [BugsnagPerformance] Invalid configuration:
+          Invalid configuration:
             - #{messages.join("\n  - ")}
         MESSAGE
       )
