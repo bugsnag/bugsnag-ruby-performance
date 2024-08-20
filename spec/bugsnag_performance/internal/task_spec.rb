@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe BugsnagPerformance::Task do
-  subject { BugsnagPerformance::Task.new(callback) }
+RSpec.describe BugsnagPerformance::Internal::Task do
+  subject { BugsnagPerformance::Internal::Task.new(callback) }
   let(:callback) { spy(Proc) }
 
   context "#schedule" do
@@ -51,7 +51,7 @@ RSpec.describe BugsnagPerformance::Task do
         sleep(0.05)
       end
 
-      task = BugsnagPerformance::Task.new(callback)
+      task = BugsnagPerformance::Internal::Task.new(callback)
       task.schedule(0.01)
 
       elapsed2 = 0
@@ -82,7 +82,7 @@ RSpec.describe BugsnagPerformance::Task do
         sleep(0.05)
       end
 
-      task = BugsnagPerformance::Task.new(callback)
+      task = BugsnagPerformance::Internal::Task.new(callback)
       task.schedule(0.01)
 
       threads = 10.times.map do
@@ -113,7 +113,7 @@ RSpec.describe BugsnagPerformance::Task do
 
     it "raises if the task has not been scheduled" do
       expect { subject.wait }.to raise_error(
-        BugsnagPerformance::Task::UnscheduledTaskError,
+        BugsnagPerformance::Internal::Task::UnscheduledTaskError,
         "Task has not been scheduled"
       )
     end
@@ -144,7 +144,7 @@ RSpec.describe BugsnagPerformance::Task do
     end
 
     it "is :processing if the task is processing" do
-      task = BugsnagPerformance::Task.new(proc { sleep(0.05) })
+      task = BugsnagPerformance::Internal::Task.new(proc { sleep(0.05) })
       task.schedule(0.01)
 
       thread = Thread.new do
@@ -165,7 +165,7 @@ RSpec.describe BugsnagPerformance::Task do
     end
 
     it "is :finished if the task fails" do
-      task = BugsnagPerformance::Task.new(proc { raise "oh no" })
+      task = BugsnagPerformance::Internal::Task.new(proc { raise "oh no" })
       task.schedule(0)
       task.wait
 

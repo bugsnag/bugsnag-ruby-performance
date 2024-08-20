@@ -1,25 +1,25 @@
 # frozen_string_literal: true
 
-RSpec.describe BugsnagPerformance::SpanExporter do
-  subject { BugsnagPerformance::SpanExporter.new(logger, probability_manager, delivery, payload_encoder, sampling_header_encoder) }
+RSpec.describe BugsnagPerformance::Internal::SpanExporter do
+  subject { BugsnagPerformance::Internal::SpanExporter.new(logger, probability_manager, delivery, payload_encoder, sampling_header_encoder) }
 
   let(:logger) { Logger.new(logger_io, level: Logger::DEBUG) }
   let(:logger_io) { StringIO.new(+"", "w+")}
   let(:logger_output) { logger_io.tap(&:rewind).read }
 
-  let(:probability_manager) { BugsnagPerformance::ProbabilityManager.new(probability_fetcher) }
-  let(:probability_fetcher) { instance_double(BugsnagPerformance::ProbabilityFetcher, { on_new_probability: nil, stale_in: nil }) }
+  let(:probability_manager) { BugsnagPerformance::Internal::ProbabilityManager.new(probability_fetcher) }
+  let(:probability_fetcher) { instance_double(BugsnagPerformance::Internal::ProbabilityFetcher, { on_new_probability: nil, stale_in: nil }) }
 
-  let(:delivery) { BugsnagPerformance::Delivery.new(configuration) }
+  let(:delivery) { BugsnagPerformance::Internal::Delivery.new(configuration) }
   let(:configuration) do
-    BugsnagPerformance::Configuration.new(BugsnagPerformance::NilErrorsConfiguration.new).tap do |config|
+    BugsnagPerformance::Configuration.new(BugsnagPerformance::Internal::NilErrorsConfiguration.new).tap do |config|
       config.api_key = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     end
   end
 
-  let(:sampler) { BugsnagPerformance::Sampler.new(probability_manager) }
-  let(:payload_encoder) { BugsnagPerformance::PayloadEncoder.new(sampler) }
-  let(:sampling_header_encoder) { BugsnagPerformance::SamplingHeaderEncoder.new }
+  let(:sampler) { BugsnagPerformance::Internal::Sampler.new(probability_manager) }
+  let(:payload_encoder) { BugsnagPerformance::Internal::PayloadEncoder.new(sampler) }
+  let(:sampling_header_encoder) { BugsnagPerformance::Internal::SamplingHeaderEncoder.new }
 
   it "sets the expected headers" do
     status = subject.export([make_span])

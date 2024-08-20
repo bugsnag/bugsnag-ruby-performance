@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe BugsnagPerformance::ProbabilityManager do
-  subject { BugsnagPerformance::ProbabilityManager.new(probability_fetcher) }
-  let(:probability_fetcher) { instance_double(BugsnagPerformance::ProbabilityFetcher) }
+RSpec.describe BugsnagPerformance::Internal::ProbabilityManager do
+  subject { BugsnagPerformance::Internal::ProbabilityManager.new(probability_fetcher) }
+  let(:probability_fetcher) { instance_double(BugsnagPerformance::Internal::ProbabilityFetcher) }
 
   it "has a default probability" do
     expect(probability_fetcher).to receive(:on_new_probability).once

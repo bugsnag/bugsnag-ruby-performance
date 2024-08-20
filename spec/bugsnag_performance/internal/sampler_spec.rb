@@ -8,7 +8,7 @@ class FakeProbabilityManager
   end
 end
 
-RSpec.describe BugsnagPerformance::Sampler do
+RSpec.describe BugsnagPerformance::Internal::Sampler do
   let(:trace_id) { OpenTelemetry::Trace.generate_trace_id }
   let(:tracestate) { Object.new }
 
@@ -24,7 +24,7 @@ RSpec.describe BugsnagPerformance::Sampler do
   end
 
   it "should always sample with a probability of 1.0" do
-    sampler = BugsnagPerformance::Sampler.new(FakeProbabilityManager.new(1.0))
+    sampler = BugsnagPerformance::Internal::Sampler.new(FakeProbabilityManager.new(1.0))
 
     result = sampler.should_sample?(
       trace_id: trace_id,
@@ -41,7 +41,7 @@ RSpec.describe BugsnagPerformance::Sampler do
   end
 
   it "should never sample with a probability of 0.0" do
-    sampler = BugsnagPerformance::Sampler.new(FakeProbabilityManager.new(0.0))
+    sampler = BugsnagPerformance::Internal::Sampler.new(FakeProbabilityManager.new(0.0))
 
     result = sampler.should_sample?(
       trace_id: trace_id,
@@ -62,7 +62,7 @@ RSpec.describe BugsnagPerformance::Sampler do
     # converted to hex for ease of reading
     trace_id = ["2b0eb6c82ae431ad7fdc00306faebef6"].pack("H*")
 
-    sampler = BugsnagPerformance::Sampler.new(FakeProbabilityManager.new(0.5))
+    sampler = BugsnagPerformance::Internal::Sampler.new(FakeProbabilityManager.new(0.5))
 
     result = sampler.should_sample?(
       trace_id: trace_id,
@@ -83,7 +83,7 @@ RSpec.describe BugsnagPerformance::Sampler do
     # converted to hex for ease of reading
     trace_id = ["98e03bf7fc2715bdcf426f549ca74150"].pack("H*")
 
-    sampler = BugsnagPerformance::Sampler.new(FakeProbabilityManager.new(0.5))
+    sampler = BugsnagPerformance::Internal::Sampler.new(FakeProbabilityManager.new(0.5))
 
     result = sampler.should_sample?(
       trace_id: trace_id,
@@ -103,7 +103,7 @@ RSpec.describe BugsnagPerformance::Sampler do
     total_spans = 50_000
     margin_of_error = total_spans / 100
 
-    sampler = BugsnagPerformance::Sampler.new(FakeProbabilityManager.new(0.5))
+    sampler = BugsnagPerformance::Internal::Sampler.new(FakeProbabilityManager.new(0.5))
     sampled_spans = 0
 
     total_spans.times do
