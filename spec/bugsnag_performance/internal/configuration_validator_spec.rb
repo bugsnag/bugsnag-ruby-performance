@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-RSpec.describe BugsnagPerformance::ConfigurationValidator do
-  subject { BugsnagPerformance::ConfigurationValidator }
+RSpec.describe BugsnagPerformance::Internal::ConfigurationValidator do
+  subject { BugsnagPerformance::Internal::ConfigurationValidator }
 
   let(:configuration) do
-    BugsnagPerformance::Configuration.new(BugsnagPerformance::NilErrorsConfiguration.new).tap do |configuration|
+    BugsnagPerformance::Configuration.new(BugsnagPerformance::Internal::NilErrorsConfiguration.new).tap do |configuration|
       configuration.api_key = "abcdef1234567890abcdef1234567890"
     end
   end
@@ -62,7 +62,7 @@ RSpec.describe BugsnagPerformance::ConfigurationValidator do
 
       expect(result.messages).to be_empty
       expect(result.valid?).to be(true)
-      expect(result.configuration.logger).to be_a(BugsnagPerformance::LoggerWrapper)
+      expect(result.configuration.logger).to be_a(BugsnagPerformance::Internal::LoggerWrapper)
       expect(result.configuration.logger.logger).to be(logger)
     end
 
@@ -75,13 +75,13 @@ RSpec.describe BugsnagPerformance::ConfigurationValidator do
       expect(result.messages.first).to match(/\Alogger should be a ::Logger, got #<Object:.+>\z/)
       expect(result.messages.length).to be(1)
       expect(result.valid?).to be(false)
-      expect(result.configuration.logger).to be_a(BugsnagPerformance::LoggerWrapper)
+      expect(result.configuration.logger).to be_a(BugsnagPerformance::Internal::LoggerWrapper)
       expect(result.configuration.logger.logger).to be(OpenTelemetry.logger)
     end
   end
 
   context "API key" do
-    let(:configuration) { BugsnagPerformance::Configuration.new(BugsnagPerformance::NilErrorsConfiguration.new) }
+    let(:configuration) { BugsnagPerformance::Configuration.new(BugsnagPerformance::Internal::NilErrorsConfiguration.new) }
 
     it "passes validation when set to a valid value" do
       configuration.api_key = "abcdef1234567890abcdef1234567890"
@@ -118,7 +118,7 @@ RSpec.describe BugsnagPerformance::ConfigurationValidator do
 
     it "raises when not set" do
       expect { subject.validate(configuration) }.to raise_error(
-        BugsnagPerformance::ConfigurationValidator::MissingApiKeyError,
+        BugsnagPerformance::MissingApiKeyError,
         "No Bugsnag API Key set",
       )
     end

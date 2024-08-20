@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-RSpec.describe BugsnagPerformance::Delivery do
-  subject { BugsnagPerformance::Delivery.new(configuration) }
+RSpec.describe BugsnagPerformance::Internal::Delivery do
+  subject { BugsnagPerformance::Internal::Delivery.new(configuration) }
 
   let(:configuration) do
-    BugsnagPerformance::Configuration.new(BugsnagPerformance::NilErrorsConfiguration.new).tap do |config|
+    BugsnagPerformance::Configuration.new(BugsnagPerformance::Internal::NilErrorsConfiguration.new).tap do |config|
       config.api_key = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     end
   end
@@ -17,9 +17,9 @@ RSpec.describe BugsnagPerformance::Delivery do
     end
   end
 
-  describe BugsnagPerformance::Delivery::Response do
+  describe BugsnagPerformance::Internal::Delivery::Response do
     subject do
-      BugsnagPerformance::Delivery.new(configuration).deliver({}, "")
+      BugsnagPerformance::Internal::Delivery.new(configuration).deliver({}, "")
     end
 
     context "#state" do
@@ -45,7 +45,7 @@ RSpec.describe BugsnagPerformance::Delivery do
         end
 
         it "is :failure_retryable when there is no response" do
-          response = BugsnagPerformance::Delivery::Response.new(nil)
+          response = BugsnagPerformance::Internal::Delivery::Response.new(nil)
 
           expect(response.state).to be(:failure_retryable)
           expect(response).not_to be_successful
@@ -94,7 +94,7 @@ RSpec.describe BugsnagPerformance::Delivery do
       end
 
       it "returns nil when there is no response" do
-        response = BugsnagPerformance::Delivery::Response.new(nil)
+        response = BugsnagPerformance::Internal::Delivery::Response.new(nil)
 
         expect(response.sampling_probability).to be_nil
       end

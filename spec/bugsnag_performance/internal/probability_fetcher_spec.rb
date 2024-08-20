@@ -18,7 +18,7 @@ class FakeTaskScheduler
   end
 end
 
-class FakeTask < BugsnagPerformance::Task
+class FakeTask < BugsnagPerformance::Internal::Task
   def initialize(done, &block)
     @done = done
     @block = block
@@ -29,18 +29,18 @@ class FakeTask < BugsnagPerformance::Task
   end
 end
 
-RSpec.describe BugsnagPerformance::ProbabilityFetcher do
+RSpec.describe BugsnagPerformance::Internal::ProbabilityFetcher do
   subject do
-    BugsnagPerformance::ProbabilityFetcher.new(logger, delivery, task_scheduler)
+    BugsnagPerformance::Internal::ProbabilityFetcher.new(logger, delivery, task_scheduler)
   end
 
   let(:logger) { Logger.new(logger_io, level: Logger::DEBUG) }
   let(:logger_io) { StringIO.new(+"", "w+")}
   let(:logger_output) { logger_io.tap(&:rewind).read }
-  let(:delivery) { BugsnagPerformance::Delivery.new(configuration) }
+  let(:delivery) { BugsnagPerformance::Internal::Delivery.new(configuration) }
 
   let(:configuration) do
-    BugsnagPerformance::Configuration.new(BugsnagPerformance::NilErrorsConfiguration.new).tap do |config|
+    BugsnagPerformance::Configuration.new(BugsnagPerformance::Internal::NilErrorsConfiguration.new).tap do |config|
       config.api_key = "abcdef1234567890abcdef1234567890"
     end
   end

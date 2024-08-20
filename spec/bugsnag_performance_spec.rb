@@ -14,7 +14,7 @@ RSpec.describe BugsnagPerformance do
 
       allow(open_telemetry).to receive(:tracer_provider).and_return(open_telemetry_tracer_provider)
       allow(open_telemetry).to receive(:logger).and_return(logger)
-      allow(open_telemetry_tracer_provider).to receive(:sampler=).with(an_instance_of(BugsnagPerformance::Sampler))
+      allow(open_telemetry_tracer_provider).to receive(:sampler=).with(an_instance_of(BugsnagPerformance::Internal::Sampler))
 
       stub_probability_request(1.0)
     end

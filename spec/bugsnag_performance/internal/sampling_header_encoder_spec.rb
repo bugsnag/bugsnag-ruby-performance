@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe BugsnagPerformance::SamplingHeaderEncoder do
+RSpec.describe BugsnagPerformance::Internal::SamplingHeaderEncoder do
   it "returns '1.0:0' when there are no spans" do
     expect(subject.encode([])).to eq("1.0:0")
   end

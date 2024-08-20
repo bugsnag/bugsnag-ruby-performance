@@ -30,23 +30,23 @@ module BugsnagPerformance
 
     block.call(unvalidated_configuration) unless block.nil?
 
-    result = ConfigurationValidator.validate(unvalidated_configuration)
+    result = Internal::ConfigurationValidator.validate(unvalidated_configuration)
     configuration = result.configuration
 
     log_validation_messages(configuration.logger, result.messages) unless result.valid?
 
-    delivery = Delivery.new(configuration)
-    task_scheduler = TaskScheduler.new
-    probability_fetcher = ProbabilityFetcher.new(configuration.logger, delivery, task_scheduler)
-    probability_manager = ProbabilityManager.new(probability_fetcher)
-    sampler = Sampler.new(probability_manager)
+    delivery = Internal::Delivery.new(configuration)
+    task_scheduler = Internal::TaskScheduler.new
+    probability_fetcher = Internal::ProbabilityFetcher.new(configuration.logger, delivery, task_scheduler)
+    probability_manager = Internal::ProbabilityManager.new(probability_fetcher)
+    sampler = Internal::Sampler.new(probability_manager)
 
-    exporter = SpanExporter.new(
+    exporter = Internal::SpanExporter.new(
       configuration.logger,
       probability_manager,
       delivery,
-      PayloadEncoder.new(sampler),
-      SamplingHeaderEncoder.new,
+      Internal::PayloadEncoder.new(sampler),
+      Internal::SamplingHeaderEncoder.new,
     )
 
     if configuration.enabled_release_stages && !configuration.enabled_release_stages.include?(configuration.release_stage)
@@ -93,7 +93,7 @@ module BugsnagPerformance
     Bugsnag.configuration
   rescue LoadError
     # bugsnag errors is not installed
-    NilErrorsConfiguration.new
+    Internal::NilErrorsConfiguration.new
   end
 
   def self.log_validation_messages(logger, messages)

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class FakeBugsnagErrorsConfiguration < BugsnagPerformance::NilErrorsConfiguration
+class FakeBugsnagErrorsConfiguration < BugsnagPerformance::Internal::NilErrorsConfiguration
   def initialize(
     logger: nil,
     api_key: nil,
@@ -17,7 +17,7 @@ class FakeBugsnagErrorsConfiguration < BugsnagPerformance::NilErrorsConfiguratio
 end
 
 RSpec.describe BugsnagPerformance::Configuration do
-  subject { BugsnagPerformance::Configuration.new(BugsnagPerformance::NilErrorsConfiguration.new) }
+  subject { BugsnagPerformance::Configuration.new(BugsnagPerformance::Internal::NilErrorsConfiguration.new) }
 
   context "configure_open_telemetry" do
     it "is callable by default" do
@@ -39,7 +39,7 @@ RSpec.describe BugsnagPerformance::Configuration do
 
   context "logger" do
     it "is OpenTelemetry's logger by default" do
-      expect(subject.logger).to be_a(BugsnagPerformance::LoggerWrapper)
+      expect(subject.logger).to be_a(BugsnagPerformance::Internal::LoggerWrapper)
       expect(subject.logger.logger).to be(OpenTelemetry.logger)
     end
 
@@ -50,13 +50,13 @@ RSpec.describe BugsnagPerformance::Configuration do
         FakeBugsnagErrorsConfiguration.new(logger: logger)
       )
 
-      expect(configuration.logger).to be_a(BugsnagPerformance::LoggerWrapper)
+      expect(configuration.logger).to be_a(BugsnagPerformance::Internal::LoggerWrapper)
       expect(configuration.logger.logger).to be(logger)
     end
 
     it "doesn't wrap a logger that has already been wrapped" do
       logger = ::Logger.new($stdout)
-      logger_wrapper = BugsnagPerformance::LoggerWrapper.new(logger)
+      logger_wrapper = BugsnagPerformance::Internal::LoggerWrapper.new(logger)
 
       subject.logger = logger_wrapper
 

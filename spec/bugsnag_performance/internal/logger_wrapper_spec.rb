@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe BugsnagPerformance::LoggerWrapper do
-  subject { BugsnagPerformance::LoggerWrapper.new(logger) }
+RSpec.describe BugsnagPerformance::Internal::LoggerWrapper do
+  subject { BugsnagPerformance::Internal::LoggerWrapper.new(logger) }
 
   let(:logger) { Logger.new(logger_io, level: Logger::DEBUG) }
   let(:logger_io) { StringIO.new(+"", "w+")}

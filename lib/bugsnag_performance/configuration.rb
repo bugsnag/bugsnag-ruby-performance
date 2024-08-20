@@ -33,10 +33,10 @@ module BugsnagPerformance
 
     def logger=(logger)
       @logger =
-        if logger.is_a?(LoggerWrapper)
+        if logger.is_a?(Internal::LoggerWrapper)
           logger
         else
-          LoggerWrapper.new(logger)
+          Internal::LoggerWrapper.new(logger)
         end
     end
 

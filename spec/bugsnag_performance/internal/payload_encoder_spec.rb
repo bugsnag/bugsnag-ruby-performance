@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe BugsnagPerformance::PayloadEncoder do
-  subject { BugsnagPerformance::PayloadEncoder.new(sampler) }
+RSpec.describe BugsnagPerformance::Internal::PayloadEncoder do
+  subject { BugsnagPerformance::Internal::PayloadEncoder.new(sampler) }
 
-  let(:sampler) { BugsnagPerformance::Sampler.new(probability_manager) }
-  let(:probability_manager) { BugsnagPerformance::ProbabilityManager.new(probability_fetcher) }
-  let(:probability_fetcher) { instance_double(BugsnagPerformance::ProbabilityFetcher, { on_new_probability: nil, stale_in: nil }) }
+  let(:sampler) { BugsnagPerformance::Internal::Sampler.new(probability_manager) }
+  let(:probability_manager) { BugsnagPerformance::Internal::ProbabilityManager.new(probability_fetcher) }
+  let(:probability_fetcher) { instance_double(BugsnagPerformance::Internal::ProbabilityFetcher, { on_new_probability: nil, stale_in: nil }) }
 
   it "can encode a single minimal span" do
     expect(subject.encode([make_span])).to match({
