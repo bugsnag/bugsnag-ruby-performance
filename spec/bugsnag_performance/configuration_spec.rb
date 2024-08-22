@@ -254,18 +254,4 @@ RSpec.describe BugsnagPerformance::Configuration do
       expect(subject.endpoint).to eq(endpoint)
     end
   end
-
-  context "use managed quota" do
-    it "is 'true' by default" do
-      expect(subject.use_managed_quota).to eq(true)
-    end
-
-    it "can be set to a valid value" do
-      use_managed_quota = false
-
-      subject.use_managed_quota = use_managed_quota
-
-      expect(subject.use_managed_quota).to eq(use_managed_quota)
-    end
-  end
 end

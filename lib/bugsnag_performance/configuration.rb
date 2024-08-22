@@ -9,7 +9,6 @@ module BugsnagPerformance
     attr_accessor :app_version
     attr_accessor :release_stage
     attr_accessor :enabled_release_stages
-    attr_accessor :use_managed_quota
 
     attr_writer :endpoint
 
@@ -20,7 +19,6 @@ module BugsnagPerformance
       @api_key = fetch(errors_configuration, :api_key, env: "BUGSNAG_PERFORMANCE_API_KEY")
       @app_version = fetch(errors_configuration, :app_version)
       @release_stage = fetch(errors_configuration, :release_stage, env: "BUGSNAG_PERFORMANCE_RELEASE_STAGE", default: "production")
-      @use_managed_quota = true
 
       @enabled_release_stages = fetch(errors_configuration, :enabled_release_stages, env: "BUGSNAG_PERFORMANCE_ENABLED_RELEASE_STAGES")
 

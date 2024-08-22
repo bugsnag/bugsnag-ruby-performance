@@ -16,7 +16,6 @@ module BugsnagPerformance
         validate_string(:app_version, optional: true)
         validate_string(:release_stage, optional: true)
         validate_array(:enabled_release_stages, "non-empty strings", optional: true, &method(:valid_string?))
-        validate_boolean(:use_managed_quota, optional: false)
         valid_endpoint = validate_endpoint
 
         # if the endpoint is invalid then we shouldn't attempt to send traces
@@ -69,16 +68,6 @@ module BugsnagPerformance
           @valid_configuration.send("#{name}=", value)
         else
           @messages << "#{name} should be a non-empty string, got #{value.inspect}"
-        end
-      end
-
-      def validate_boolean(name, optional:)
-        value = @configuration.send(name)
-
-        if (value.nil? && optional) || value == true || value == false
-          @valid_configuration.send("#{name}=", value)
-        else
-          @messages << "#{name} should be a boolean, got #{value.inspect}"
         end
       end
 
