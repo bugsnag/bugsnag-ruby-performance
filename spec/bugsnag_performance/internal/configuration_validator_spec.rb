@@ -233,41 +233,6 @@ RSpec.describe BugsnagPerformance::Internal::ConfigurationValidator do
     end
   end
 
-  context "use managed quota" do
-    it "is required" do
-      configuration.use_managed_quota = nil
-      result = subject.validate(configuration)
-
-      expect(result.messages).to eq([
-        "use_managed_quota should be a boolean, got nil",
-      ])
-
-      expect(result.valid?).to be(false)
-      expect(result.configuration.use_managed_quota).to be(true)
-    end
-
-    it "passes validation when set to a valid value" do
-      configuration.use_managed_quota = false
-      result = subject.validate(configuration)
-
-      expect(result.messages).to be_empty
-      expect(result.valid?).to be(true)
-      expect(result.configuration.use_managed_quota).to be(false)
-    end
-
-    it "fails validation when set to an invalid type" do
-      configuration.use_managed_quota = "falsey"
-      result = subject.validate(configuration)
-
-      expect(result.messages).to eq([
-        'use_managed_quota should be a boolean, got "falsey"',
-      ])
-
-      expect(result.valid?).to be(false)
-      expect(result.configuration.use_managed_quota).to be(true)
-    end
-  end
-
   context "endpoint" do
     it "is required" do
       configuration.endpoint = nil
