@@ -1,12 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe BugsnagPerformance::Internal::PayloadEncoder do
-  subject { BugsnagPerformance::Internal::PayloadEncoder.new(sampler) }
-
-  let(:sampler) { BugsnagPerformance::Internal::Sampler.new(probability_manager) }
-  let(:probability_manager) { BugsnagPerformance::Internal::ProbabilityManager.new(probability_fetcher) }
-  let(:probability_fetcher) { instance_double(BugsnagPerformance::Internal::ProbabilityFetcher, { on_new_probability: nil, stale_in: nil }) }
-
   it "can encode a single minimal span" do
     expect(subject.encode([make_span])).to match({
       resourceSpans: [
@@ -209,47 +203,5 @@ RSpec.describe BugsnagPerformance::Internal::PayloadEncoder do
         }
       ]
     })
-  end
-
-  it "resamples spans against the current probability" do
-    resource = OpenTelemetry::SDK::Resources::Resource.create
-    scope = OpenTelemetry::SDK::InstrumentationScope.new
-
-    make_span_with_probability = proc do |probability, trace_id:|
-      make_span(
-        name: "span #{probability}",
-        trace_id: trace_id,
-        attributes: { "bugsnag.sampling.p" => probability },
-        resource: resource,
-        instrumentation_scope: scope
-      )
-    end
-
-    spans = [
-      make_span_with_probability.(0.1, trace_id: "aaaaaaaaaaaaaaaa"), # should NOT be sampled
-      make_span_with_probability.(0.2, trace_id: "aaaaaaaaaaaaaaab"), # should NOT be sampled
-      make_span_with_probability.(0.3, trace_id: "aaaaaaaaaaaaaaac"), # should NOT be sampled
-      make_span_with_probability.(0.4, trace_id: "aaaaaaaaaaaaaaad"),
-      make_span_with_probability.(0.5, trace_id: "aaaaaaaaaaaaaaae"),
-      make_span_with_probability.(0.6, trace_id: "aaaaaaaaaaaaaaaf"),
-      make_span_with_probability.(0.7, trace_id: "aaaaaaaaaaaaaaag"),
-      make_span_with_probability.(0.8, trace_id: "aaaaaaaaaaaaaaah"),
-      make_span_with_probability.(0.9, trace_id: "aaaaaaaaaaaaaaai"),
-      make_span_with_probability.(1.0, trace_id: "aaaaaaaaaaaaaaaj"),
-    ]
-
-    probability_manager.probability = 0.5
-
-    # spans 0.6-1.0 should have their 'bugsnag.sampling.p' attribute reduced to
-    # '0.5' as the current probability is smaller
-    expect(subject.encode(spans).dig(:resourceSpans, 0, :scopeSpans, 0, :spans)).to match([
-      include({ name: "span 0.4", attributes: [{ key: "bugsnag.sampling.p", value: { doubleValue: 0.4 }}] }),
-      include({ name: "span 0.5", attributes: [{ key: "bugsnag.sampling.p", value: { doubleValue: 0.5 }}] }),
-      include({ name: "span 0.6", attributes: [{ key: "bugsnag.sampling.p", value: { doubleValue: 0.5 }}] }),
-      include({ name: "span 0.7", attributes: [{ key: "bugsnag.sampling.p", value: { doubleValue: 0.5 }}] }),
-      include({ name: "span 0.8", attributes: [{ key: "bugsnag.sampling.p", value: { doubleValue: 0.5 }}] }),
-      include({ name: "span 0.9", attributes: [{ key: "bugsnag.sampling.p", value: { doubleValue: 0.5 }}] }),
-      include({ name: "span 1.0", attributes: [{ key: "bugsnag.sampling.p", value: { doubleValue: 0.5 }}] }),
-    ])
   end
 end
