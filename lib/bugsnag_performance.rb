@@ -45,9 +45,16 @@ module BugsnagPerformance
       configuration.logger,
       probability_manager,
       delivery,
-      Internal::PayloadEncoder.new(sampler),
+      sampler,
+      Internal::PayloadEncoder.new,
       Internal::SamplingHeaderEncoder.new,
     )
+
+    # enter unmanaged mode if the OTel sampler environment variable has been set
+    # note: we assume any value means a non-default sampler will be used because
+    #       we don't control what the valid values are
+    user_has_custom_sampler = ENV.key?("OTEL_TRACES_SAMPLER")
+    exporter.unmanaged_mode! if user_has_custom_sampler
 
     if configuration.enabled_release_stages && !configuration.enabled_release_stages.include?(configuration.release_stage)
       configuration.logger.info("Not exporting spans as the current release stage is not in the enabled release stages.")
@@ -78,8 +85,10 @@ module BugsnagPerformance
       )
     end
 
-    # use our sampler
-    OpenTelemetry.tracer_provider.sampler = sampler
+    # don't use our sampler if the user has configured a sampler via the OTel
+    # environment variable
+    # note: the user can still replace our sampler with their own after this
+    OpenTelemetry.tracer_provider.sampler = sampler unless user_has_custom_sampler
 
     return_value
   end

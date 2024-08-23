@@ -3,6 +3,8 @@
 module BugsnagPerformance
   module Internal
     class Delivery
+      attr_reader :uri
+
       def initialize(configuration)
         @uri = URI(configuration.endpoint)
         @common_headers = {

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe BugsnagPerformance::Internal::SpanExporter do
-  subject { BugsnagPerformance::Internal::SpanExporter.new(logger, probability_manager, delivery, payload_encoder, sampling_header_encoder) }
+  subject { BugsnagPerformance::Internal::SpanExporter.new(logger, probability_manager, delivery, sampler, payload_encoder, sampling_header_encoder) }
 
   let(:logger) { Logger.new(logger_io, level: Logger::DEBUG) }
   let(:logger_io) { StringIO.new(+"", "w+")}
@@ -18,8 +18,17 @@ RSpec.describe BugsnagPerformance::Internal::SpanExporter do
   end
 
   let(:sampler) { BugsnagPerformance::Internal::Sampler.new(probability_manager) }
-  let(:payload_encoder) { BugsnagPerformance::Internal::PayloadEncoder.new(sampler) }
+  let(:payload_encoder) { BugsnagPerformance::Internal::PayloadEncoder.new }
   let(:sampling_header_encoder) { BugsnagPerformance::Internal::SamplingHeaderEncoder.new }
+
+  let(:open_telemetry) { class_double(OpenTelemetry).as_stubbed_const({ transfer_nested_constants: true }) }
+  let(:open_telemetry_tracer_provider) { instance_double(OpenTelemetry::SDK::Trace::TracerProvider) }
+
+  before do
+    allow(open_telemetry).to receive(:tracer_provider).and_return(open_telemetry_tracer_provider)
+    allow(open_telemetry).to receive(:logger).and_return(logger)
+    allow(open_telemetry_tracer_provider).to receive(:sampler).and_return(sampler)
+  end
 
   it "sets the expected headers" do
     status = subject.export([make_span])
@@ -31,7 +40,7 @@ RSpec.describe BugsnagPerformance::Internal::SpanExporter do
       expect(headers["Bugsnag-Sent-At"]).to match(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\z/)
       expect(headers["Content-Type"]).to eq("application/json")
     }
-    expect(logger_output).to be_empty
+    expect(logger_output).to include("Sending managed spans to https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.otlp.bugsnag.com/v1/traces")
   end
 
   it "updates the probability value from the response" do
@@ -43,7 +52,7 @@ RSpec.describe BugsnagPerformance::Internal::SpanExporter do
 
     expect(status).to be(OpenTelemetry::SDK::Trace::Export::SUCCESS)
     expect(probability_manager.probability).to be(0.5)
-    expect(logger_output).to be_empty
+    expect(logger_output).to include("Sending managed spans to https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.otlp.bugsnag.com/v1/traces")
   end
 
   it "can deliver a single minimal span" do
@@ -67,7 +76,7 @@ RSpec.describe BugsnagPerformance::Internal::SpanExporter do
       })
     }
 
-    expect(logger_output).to be_empty
+    expect(logger_output).to include("Sending managed spans to https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.otlp.bugsnag.com/v1/traces")
   end
 
   it "can deliver a single complex span" do
@@ -154,7 +163,8 @@ RSpec.describe BugsnagPerformance::Internal::SpanExporter do
       })
     }
 
-    expect(logger_output).to include("One or more spans are missing the 'bugsnag.sampling.p' attribute. This trace will be sent as 'unmanaged'.")
+    expect(logger_output).to include("One or more spans are missing the 'bugsnag.sampling.p' attribute. This trace will be sent as unmanaged")
+    expect(logger_output).to include("Sending unmanaged spans to https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.otlp.bugsnag.com/v1/traces")
   end
 
   it "obeys the given timeout" do
@@ -191,5 +201,125 @@ RSpec.describe BugsnagPerformance::Internal::SpanExporter do
     expect(status).to be(OpenTelemetry::SDK::Trace::Export::SUCCESS)
     expect(subject).not_to have_sent_trace
     expect(logger_output).to be_empty
+  end
+
+  it "resamples spans against the current probability" do
+    resource = OpenTelemetry::SDK::Resources::Resource.create
+    scope = OpenTelemetry::SDK::InstrumentationScope.new
+
+    make_span_with_probability = proc do |probability, trace_id:|
+      make_span(
+        name: "span #{probability}",
+        trace_id: trace_id,
+        attributes: { "bugsnag.sampling.p" => probability },
+        resource: resource,
+        instrumentation_scope: scope
+      )
+    end
+
+    spans = [
+      make_span_with_probability.(0.1, trace_id: "aaaaaaaaaaaaaaaa"), # should NOT be sampled
+      make_span_with_probability.(0.2, trace_id: "aaaaaaaaaaaaaaab"), # should NOT be sampled
+      make_span_with_probability.(0.3, trace_id: "aaaaaaaaaaaaaaac"), # should NOT be sampled
+      make_span_with_probability.(0.4, trace_id: "aaaaaaaaaaaaaaad"),
+      make_span_with_probability.(0.5, trace_id: "aaaaaaaaaaaaaaae"),
+      make_span_with_probability.(0.6, trace_id: "aaaaaaaaaaaaaaaf"),
+      make_span_with_probability.(0.7, trace_id: "aaaaaaaaaaaaaaag"),
+      make_span_with_probability.(0.8, trace_id: "aaaaaaaaaaaaaaah"),
+      make_span_with_probability.(0.9, trace_id: "aaaaaaaaaaaaaaai"),
+      make_span_with_probability.(1.0, trace_id: "aaaaaaaaaaaaaaaj"),
+    ]
+
+    probability_manager.probability = 0.5
+
+    status = subject.export(spans)
+    expect(status).to be(OpenTelemetry::SDK::Trace::Export::SUCCESS)
+    expect(logger_output).to include("Sending managed spans to https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.otlp.bugsnag.com/v1/traces")
+
+    # spans 0.6-1.0 should have their 'bugsnag.sampling.p' attribute reduced to
+    # '0.5' as the current probability is smaller
+    expect(subject).to have_sent_trace { |spans:, headers:, **|
+      expect(headers["Bugsnag-Span-Sampling"]).to eq("0.4:1;0.5:6")
+
+      expect(spans).to match([
+        include({ "name" => "span 0.4", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.4 }}] }),
+        include({ "name" => "span 0.5", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.5 }}] }),
+        include({ "name" => "span 0.6", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.5 }}] }),
+        include({ "name" => "span 0.7", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.5 }}] }),
+        include({ "name" => "span 0.8", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.5 }}] }),
+        include({ "name" => "span 0.9", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.5 }}] }),
+        include({ "name" => "span 1.0", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.5 }}] }),
+      ])
+    }
+  end
+
+  it "does not resample spans when in unmanaged mode" do
+    resource = OpenTelemetry::SDK::Resources::Resource.create
+    scope = OpenTelemetry::SDK::InstrumentationScope.new
+
+    make_span_with_probability = proc do |probability, trace_id:|
+      make_span(
+        name: "span #{probability}",
+        trace_id: trace_id,
+        attributes: { "bugsnag.sampling.p" => probability },
+        resource: resource,
+        instrumentation_scope: scope
+      )
+    end
+
+    spans = [
+      make_span_with_probability.(0.1, trace_id: "aaaaaaaaaaaaaaaa"), # should NOT be sampled if sampling was enabled
+      make_span_with_probability.(0.2, trace_id: "aaaaaaaaaaaaaaab"), # should NOT be sampled if sampling was enabled
+      make_span_with_probability.(0.3, trace_id: "aaaaaaaaaaaaaaac"), # should NOT be sampled if sampling was enabled
+      make_span_with_probability.(0.4, trace_id: "aaaaaaaaaaaaaaad"),
+      make_span_with_probability.(0.5, trace_id: "aaaaaaaaaaaaaaae"),
+      make_span_with_probability.(0.6, trace_id: "aaaaaaaaaaaaaaaf"),
+      make_span_with_probability.(0.7, trace_id: "aaaaaaaaaaaaaaag"),
+      make_span_with_probability.(0.8, trace_id: "aaaaaaaaaaaaaaah"),
+      make_span_with_probability.(0.9, trace_id: "aaaaaaaaaaaaaaai"),
+      make_span_with_probability.(1.0, trace_id: "aaaaaaaaaaaaaaaj"),
+    ]
+
+    probability_manager.probability = 0.5
+
+    subject.unmanaged_mode!
+    expect(subject.unmanaged_mode?).to be(true)
+
+    status = subject.export(spans)
+    expect(status).to be(OpenTelemetry::SDK::Trace::Export::SUCCESS)
+    expect(logger_output).to include("Sending unmanaged spans to https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.otlp.bugsnag.com/v1/traces")
+
+    # all spans should be encoded and their p values should remain unchanged as
+    # we have disabled resampling
+    expect(subject).to have_sent_trace { |spans:, headers:, **|
+      expect(headers.key?("Bugsnag-Span-Sampling")).to be(false)
+
+      expect(spans).to match([
+        include({ "name" => "span 0.1", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.1 }}] }),
+        include({ "name" => "span 0.2", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.2 }}] }),
+        include({ "name" => "span 0.3", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.3 }}] }),
+        include({ "name" => "span 0.4", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.4 }}] }),
+        include({ "name" => "span 0.5", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.5 }}] }),
+        include({ "name" => "span 0.6", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.6 }}] }),
+        include({ "name" => "span 0.7", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.7 }}] }),
+        include({ "name" => "span 0.8", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.8 }}] }),
+        include({ "name" => "span 0.9", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 0.9 }}] }),
+        include({ "name" => "span 1.0", "attributes" => [{ "key" => "bugsnag.sampling.p", "value" => { "doubleValue" => 1.0 }}] }),
+      ])
+    }
+  end
+
+  it "only logs delivery once" do
+    status = subject.export([make_span])
+    expect(status).to be(OpenTelemetry::SDK::Trace::Export::SUCCESS)
+
+    expect(logger_output).to include("Sending managed spans to https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.otlp.bugsnag.com/v1/traces")
+
+    logger_output_before = logger_output.dup
+
+    status = subject.export([make_span])
+    expect(status).to be(OpenTelemetry::SDK::Trace::Export::SUCCESS)
+
+    expect(logger_output).to eq(logger_output_before)
   end
 end

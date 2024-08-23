@@ -26,14 +26,9 @@ module BugsnagPerformance
         :SPAN_STATUS_UNSET,
         :SPAN_STATUS_ERROR
 
-      def initialize(sampler)
-        @sampler = sampler
-      end
-
       def encode(span_data)
         {
           resourceSpans: span_data
-            .filter { |span| @sampler.resample_span?(span) }
             .group_by(&:resource)
             .map do |resource, scope_spans|
               {
