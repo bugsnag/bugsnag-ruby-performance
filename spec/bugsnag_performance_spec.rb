@@ -11,6 +11,7 @@ RSpec.describe BugsnagPerformance do
       allow(open_telemetry_sdk).to receive(:configure).and_yield(open_telemetry_configurator)
       allow(open_telemetry_configurator).to receive(:resource=).with(an_instance_of(OpenTelemetry::SDK::Resources::Resource))
       allow(open_telemetry_configurator).to receive(:add_span_processor).with(an_instance_of(OpenTelemetry::SDK::Trace::Export::BatchSpanProcessor))
+      allow(open_telemetry_configurator).to receive(:add_span_processor).with(an_instance_of(BugsnagPerformance::Internal::ProbabilityAttributeSpanProcessor))
 
       allow(open_telemetry).to receive(:tracer_provider).and_return(open_telemetry_tracer_provider)
       allow(open_telemetry).to receive(:logger).and_return(logger)
