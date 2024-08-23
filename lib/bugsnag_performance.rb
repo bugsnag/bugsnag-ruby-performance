@@ -23,6 +23,7 @@ require_relative "bugsnag_performance/internal/probability_manager"
 require_relative "bugsnag_performance/internal/configuration_validator"
 require_relative "bugsnag_performance/internal/sampling_header_encoder"
 require_relative "bugsnag_performance/internal/nil_errors_configuration"
+require_relative "bugsnag_performance/internal/probability_attribute_span_processor"
 
 module BugsnagPerformance
   def self.configure(&block)
@@ -82,6 +83,12 @@ module BugsnagPerformance
       # add batch processor with bugsnag exporter to send payloads
       otel_configurator.add_span_processor(
         OpenTelemetry::SDK::Trace::Export::BatchSpanProcessor.new(exporter)
+      )
+
+      # ensure the "bugsnag.sampling.p" attribute is set on all spans even when
+      # our sampler is not in use
+      otel_configurator.add_span_processor(
+        Internal::ProbabilityAttributeSpanProcessor.new(probability_manager)
       )
     end
 
