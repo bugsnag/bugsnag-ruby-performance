@@ -6,6 +6,7 @@ services:
         - RUBY_TEST_VERSION
         - OPEN_TELEMETRY_SDK_TEST_VERSION
     environment:
+      - OTEL_TRACES_SAMPLER
       - MAZE_RUNNER_API_KEY
       - MAZE_RUNNER_ENDPOINT
 
