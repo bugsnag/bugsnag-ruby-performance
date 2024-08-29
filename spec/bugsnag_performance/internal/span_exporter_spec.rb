@@ -17,7 +17,8 @@ RSpec.describe BugsnagPerformance::Internal::SpanExporter do
     end
   end
 
-  let(:sampler) { BugsnagPerformance::Internal::Sampler.new(probability_manager) }
+  let(:tracestate_parser) { BugsnagPerformance::Internal::TracestateParser.new }
+  let(:sampler) { BugsnagPerformance::Internal::Sampler.new(probability_manager, tracestate_parser) }
   let(:payload_encoder) { BugsnagPerformance::Internal::PayloadEncoder.new }
   let(:sampling_header_encoder) { BugsnagPerformance::Internal::SamplingHeaderEncoder.new }
 
