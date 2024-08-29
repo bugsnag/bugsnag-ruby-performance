@@ -42,7 +42,7 @@ module BugsnagPerformance
     task_scheduler = Internal::TaskScheduler.new
     probability_fetcher = Internal::ProbabilityFetcher.new(configuration.logger, delivery, task_scheduler)
     probability_manager = Internal::ProbabilityManager.new(probability_fetcher)
-    sampler = Internal::Sampler.new(probability_manager)
+    sampler = Internal::Sampler.new(probability_manager, Internal::TracestateParser.new)
 
     exporter = Internal::SpanExporter.new(
       configuration.logger,
