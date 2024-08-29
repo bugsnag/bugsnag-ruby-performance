@@ -60,8 +60,6 @@ RSpec.describe BugsnagPerformance::Internal::ProbabilityAttributeSpanProcessor d
         "an.other.attribute" => "abc",
       })
 
-      pp span.attributes
-
       probability_manager.probability = 0.6
       status = subject.on_start(span, OpenTelemetry::Context.empty)
 
