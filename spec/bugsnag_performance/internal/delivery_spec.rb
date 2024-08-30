@@ -14,6 +14,16 @@ RSpec.describe BugsnagPerformance::Internal::Delivery do
       response = subject.deliver({ "header" => "yes" }, "hello")
 
       expect(response).to be_successful
+      expect(WebMock).to have_requested(:post, TRACES_URI)
+        .with(
+          body: "hello",
+          headers: {
+            "header" => "yes",
+            "Content-Type" => "application/json",
+            "Bugsnag-Api-Key" => "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "User-Agent" => "Ruby Bugsnag Performance SDK v#{BugsnagPerformance::VERSION}",
+          }
+        ).once
     end
   end
 
