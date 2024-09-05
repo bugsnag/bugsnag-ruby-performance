@@ -86,6 +86,14 @@ RSpec.describe BugsnagPerformance::Configuration do
       end
     end
 
+    it "reads from the errors environment variable when bugsnag errors is not present" do
+      api_key = "00cdef1234567890abcdef1234567890"
+
+      with_environment_variable("BUGSNAG_API_KEY", api_key) do
+        expect(subject.api_key).to eq(api_key)
+      end
+    end
+
     it "reads from bugsnag errors if present" do
       api_key = "abcdef1234567890abcdef1234567899"
 
@@ -106,6 +114,17 @@ RSpec.describe BugsnagPerformance::Configuration do
         )
 
         expect(configuration.api_key).to eq(environment_api_key)
+      end
+    end
+
+    it "reads from the performance environment variable before bugsnag errors' environment variable" do
+      performance_api_key = "00000000000000000000000000000000"
+      errors_api_key = "abcdef1234567890abcdef1234567899"
+
+      with_environment_variable("BUGSNAG_PERFORMANCE_API_KEY", performance_api_key) do
+        with_environment_variable("BUGSNAG_API_KEY", errors_api_key) do
+          expect(subject.api_key).to eq(performance_api_key)
+        end
       end
     end
   end
@@ -155,6 +174,14 @@ RSpec.describe BugsnagPerformance::Configuration do
       end
     end
 
+    it "reads from the errors environment variable when bugsnag errors is not present" do
+      release_stage = "preview"
+
+      with_environment_variable("BUGSNAG_RELEASE_STAGE", release_stage) do
+        expect(subject.release_stage).to eq(release_stage)
+      end
+    end
+
     it "reads from bugsnag errors if present" do
       release_stage = "development"
 
@@ -175,6 +202,17 @@ RSpec.describe BugsnagPerformance::Configuration do
         )
 
         expect(configuration.release_stage).to eq(environment_release_stage)
+      end
+    end
+
+    it "reads from the performance environment variable before bugsnag errors' environment variable" do
+      performance_release_stage = "development"
+      errors_release_stage = "staging"
+
+      with_environment_variable("BUGSNAG_PERFORMANCE_RELEASE_STAGE", performance_release_stage) do
+        with_environment_variable("BUGSNAG_RELEASE_STAGE", errors_release_stage) do
+          expect(subject.release_stage).to eq(performance_release_stage)
+        end
       end
     end
   end

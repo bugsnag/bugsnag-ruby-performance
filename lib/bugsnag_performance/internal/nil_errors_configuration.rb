@@ -10,6 +10,13 @@ module BugsnagPerformance
       attr_accessor :release_stage
       attr_accessor :enabled_release_stages
       attr_accessor :logger
+
+      def initialize
+        # if bugsnag errors is not installed we still want to read from the
+        # environment variables it supports
+        @api_key = ENV["BUGSNAG_API_KEY"]
+        @release_stage = ENV["BUGSNAG_RELEASE_STAGE"]
+      end
     end
   end
 end
