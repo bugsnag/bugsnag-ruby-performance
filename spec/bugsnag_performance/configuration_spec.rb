@@ -142,6 +142,22 @@ RSpec.describe BugsnagPerformance::Configuration do
       expect(subject.app_version).to eq(app_version)
     end
 
+    it "reads from the performance environment variable" do
+      app_version = "ia9y39hfa0"
+
+      with_environment_variable("BUGSNAG_PERFORMANCE_APP_VERSION", app_version) do
+        expect(subject.app_version).to eq(app_version)
+      end
+    end
+
+    it "reads from the errors environment variable when bugsnag errors is not present" do
+      app_version = "oja93bs72"
+
+      with_environment_variable("BUGSNAG_APP_VERSION", app_version) do
+        expect(subject.app_version).to eq(app_version)
+      end
+    end
+
     it "reads from bugsnag errors if present" do
       app_version = "9.1.2"
 
@@ -150,6 +166,30 @@ RSpec.describe BugsnagPerformance::Configuration do
       )
 
       expect(configuration.app_version).to eq(app_version)
+    end
+
+    it "reads from the performance environment variable before bugsnag errors" do
+      environment_app_version = "0.9.1"
+      errors_app_version = "7.3.6"
+
+      with_environment_variable("BUGSNAG_PERFORMANCE_APP_VERSION", environment_app_version) do
+        configuration = BugsnagPerformance::Configuration.new(
+          FakeBugsnagErrorsConfiguration.new(app_version: errors_app_version)
+        )
+
+        expect(configuration.app_version).to eq(environment_app_version)
+      end
+    end
+
+    it "reads from the performance environment variable before bugsnag errors' environment variable" do
+      performance_app_version = "6.23"
+      errors_app_version = "4.56.6"
+
+      with_environment_variable("BUGSNAG_PERFORMANCE_APP_VERSION", performance_app_version) do
+        with_environment_variable("BUGSNAG_APP_VERSION", errors_app_version) do
+          expect(subject.app_version).to eq(performance_app_version)
+        end
+      end
     end
   end
 
@@ -242,6 +282,12 @@ RSpec.describe BugsnagPerformance::Configuration do
       end
     end
 
+    it "reads from the errors environment variable" do
+      with_environment_variable("BUGSNAG_ENABLED_RELEASE_STAGES", "   staging,   qa, production    ") do
+        expect(subject.enabled_release_stages).to eq(["staging", "qa", "production"])
+      end
+    end
+
     it "reads from bugsnag errors if present" do
       enabled_release_stages = ["development", "test"]
 
@@ -262,6 +308,17 @@ RSpec.describe BugsnagPerformance::Configuration do
         )
 
         expect(configuration.enabled_release_stages).to eq(["development", "staging", "production"])
+      end
+    end
+
+    it "reads from the performance environment variable before bugsnag errors' environment variable" do
+      performance_enabled_release_stages = ["dev", "elopment"]
+      errors_enabled_release_stages = "staging,production"
+
+      with_environment_variable("BUGSNAG_PERFORMANCE_ENABLED_RELEASE_STAGES", performance_enabled_release_stages.join(", ")) do
+        with_environment_variable("BUGSNAG_ENABLED_RELEASE_STAGES", errors_enabled_release_stages) do
+          expect(subject.enabled_release_stages).to eq(performance_enabled_release_stages)
+        end
       end
     end
   end
