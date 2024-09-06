@@ -28,6 +28,11 @@ require_relative "bugsnag_performance/internal/nil_errors_configuration"
 require_relative "bugsnag_performance/internal/probability_attribute_span_processor"
 
 module BugsnagPerformance
+  # Configure Bugsnag Performance
+  #
+  # Yields a {Configuration} object to use to set application settings.
+  #
+  # @yieldparam configuration [Configuration]
   def self.configure(&block)
     unvalidated_configuration = Configuration.new(load_bugsnag_errors_configuration)
 
