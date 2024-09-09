@@ -28,7 +28,7 @@ require_relative "bugsnag_performance/internal/nil_errors_configuration"
 require_relative "bugsnag_performance/internal/probability_attribute_span_processor"
 
 module BugsnagPerformance
-  # Configure Bugsnag Performance
+  # Configure BugSnag Performance
   #
   # Yields a {Configuration} object to use to set application settings.
   #

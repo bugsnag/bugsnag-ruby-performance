@@ -3,7 +3,7 @@
 --hide-api private
 --no-private
 --protected
---title "bugsnag-ruby API Documentation"
+--title "BugSnag Ruby Performance API Documentation"
 --embed-mixins
 --exclude /internal/
 -
