@@ -79,7 +79,7 @@ module BugsnagPerformance
 
     # The URL to send traces to
     #
-    # If not set this defaults to "https://<api_key>/otlp.bugsnag.com/v1/traces"
+    # If not set this defaults to "https://<api_key>.otlp.bugsnag.com/v1/traces"
     #
     # @return [String, nil]
     def endpoint
