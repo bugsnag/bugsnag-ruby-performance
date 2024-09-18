@@ -2,12 +2,51 @@
 
 module BugsnagPerformance
   class Configuration
+    # @api private
     attr_reader :open_telemetry_configure_block
+
+    # The logger BugSnag Performance will write messages to
+    #
+    # If not set, this will default to the BugSnag Errors logger or the Open
+    # Telemetry SDK logger
+    #
+    # @return [Logger]
     attr_reader :logger
 
+    # Your BugSnag API Key
+    #
+    # If not set, this will be read from the "BUGSNAG_PERFORMANCE_API_KEY" and
+    # "BUGSNAG_API_KEY" environment variables or BugSnag Errors configuration.
+    # If none of these returns an API key, a {MissingApiKeyError} will be raised
+    #
+    # @return [String, nil]
     attr_accessor :api_key
+
+    # The current version of the application, for example "1.2.3"
+    #
+    # If not set, this will be read from the "BUGSNAG_PERFORMANCE_APP_VERSION"
+    # and "BUGSNAG_APP_VERSION" environment variables or BugSnag Errors
+    # configuration
+    #
+    # @return [String]
     attr_accessor :app_version
+
+    # The current stage of the release process, for example "development" or "production"
+    #
+    # If not set, this will be read from the "BUGSNAG_PERFORMANCE_RELEASE_STAGE"
+    # and "BUGSNAG_RELEASE_STAGE" environment variables or BugSnag Errors
+    # configuration and defaults to "production"
+    #
+    # @return [String]
     attr_accessor :release_stage
+
+    # Which release stages to send traces for, for example ["staging", production"]
+    #
+    # If not set, this will be read from the "BUGSNAG_PERFORMANCE_ENABLED_RELEASE_STAGES"
+    # and "BUGSNAG_ENABLED_RELEASE_STAGES" environment variables or BugSnag Errors
+    # configuration and defaults to allow any release stage
+    #
+    # @return [Array<String>, nil]
     attr_accessor :enabled_release_stages
 
     attr_writer :endpoint
@@ -38,6 +77,11 @@ module BugsnagPerformance
         end
     end
 
+    # The URL to send traces to
+    #
+    # If not set this defaults to "https://<api_key>.otlp.bugsnag.com/v1/traces"
+    #
+    # @return [String, nil]
     def endpoint
       case
       when defined?(@endpoint)
@@ -51,6 +95,9 @@ module BugsnagPerformance
       end
     end
 
+    # Apply configuration for the Open Telemetry SDK
+    #
+    # This block should *replace* any calls to OpenTelemetry::SDK.configure
     def configure_open_telemetry(&open_telemetry_configure_block)
       @open_telemetry_configure_block = open_telemetry_configure_block
     end

@@ -1,0 +1,11 @@
+--charset UTF-8
+--fail-on-warning
+--hide-api private
+--no-private
+--protected
+--title "BugSnag Ruby Performance API Documentation"
+--embed-mixins
+--exclude /internal/
+-
+README.md
+CHANGELOG.md
