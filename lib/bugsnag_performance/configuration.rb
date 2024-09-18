@@ -56,7 +56,7 @@ module BugsnagPerformance
       self.logger = errors_configuration.logger || OpenTelemetry.logger
 
       @api_key = fetch(errors_configuration, :api_key, env: "BUGSNAG_PERFORMANCE_API_KEY")
-      @app_version = fetch(errors_configuration, :app_version)
+      @app_version = fetch(errors_configuration, :app_version, env: "BUGSNAG_PERFORMANCE_APP_VERSION")
       @release_stage = fetch(errors_configuration, :release_stage, env: "BUGSNAG_PERFORMANCE_RELEASE_STAGE", default: "production")
 
       @enabled_release_stages = fetch(errors_configuration, :enabled_release_stages, env: "BUGSNAG_PERFORMANCE_ENABLED_RELEASE_STAGES")
