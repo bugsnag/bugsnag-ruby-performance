@@ -27,5 +27,6 @@ Tracer = OpenTelemetry.tracer_provider.tracer("maze tracer")
 5.times do |i|
   Tracer.in_span("test span #{i + 1}") do |span|
     span.set_attribute("span.custom.age", i * 10)
+    span.set_attribute("bugsnag.span.first_class", true)
   end
 end
