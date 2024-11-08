@@ -32,7 +32,11 @@ RSpec.describe BugsnagPerformance do
     it "sets the expected resource attributes to the configured values" do
       expect(open_telemetry_configurator).to receive(:service_version=).with("1.2.3")
       expect(open_telemetry_configurator).to receive(:resource=).with(
-        satisfy { |resource| resource.attribute_enumerator.to_h == { "deployment.environment" => "prodevelopment" } }
+        satisfy { |resource| resource.attribute_enumerator.to_h == { 
+          "deployment.environment" => "prodevelopment",
+          "bugsnag.telemetry.sdk.name"=>"Ruby Bugsnag Performance SDK",
+          "bugsnag.telemetry.sdk.version"=>BugsnagPerformance::VERSION,
+        } }
       )
 
       BugsnagPerformance.configure do |configuration|
@@ -62,7 +66,11 @@ RSpec.describe BugsnagPerformance do
     it "logs when the current release stage is disabled" do
       expect(open_telemetry_configurator).not_to receive(:service_version=)
       expect(open_telemetry_configurator).to receive(:resource=).with(
-        satisfy { |resource| resource.attribute_enumerator.to_h == { "deployment.environment" => "prodevelopment" } }
+        satisfy { |resource| resource.attribute_enumerator.to_h == {
+          "deployment.environment" => "prodevelopment",
+          "bugsnag.telemetry.sdk.name"=>"Ruby Bugsnag Performance SDK",
+          "bugsnag.telemetry.sdk.version"=>BugsnagPerformance::VERSION,
+         } }
       )
 
       BugsnagPerformance.configure do |configuration|

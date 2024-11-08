@@ -84,7 +84,11 @@ module BugsnagPerformance
       end
 
       otel_configurator.resource = OpenTelemetry::SDK::Resources::Resource.create(
-        OpenTelemetry::SemanticConventions::Resource::DEPLOYMENT_ENVIRONMENT => configuration.release_stage
+        {
+          OpenTelemetry::SemanticConventions::Resource::DEPLOYMENT_ENVIRONMENT => configuration.release_stage,
+          "bugsnag.telemetry.sdk.name" => "Ruby Bugsnag Performance SDK",
+          "bugsnag.telemetry.sdk.version" => VERSION,
+        }
       )
 
       # add batch processor with bugsnag exporter to send payloads
