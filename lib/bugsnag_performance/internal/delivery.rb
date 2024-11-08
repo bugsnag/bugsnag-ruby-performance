@@ -17,7 +17,7 @@ module BugsnagPerformance
       def deliver(headers, body)
         headers = headers.merge(
           @common_headers,
-        # TODO - add this back when pipeline is ready
+        # TODO - can be restored after https://smartbear.atlassian.net/browse/PIPE-7498
         #  { "Bugsnag-Sent-At" => Time.now.utc.iso8601(3) },
         )
 
