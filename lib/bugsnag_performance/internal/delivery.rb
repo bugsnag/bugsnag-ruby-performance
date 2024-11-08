@@ -17,7 +17,8 @@ module BugsnagPerformance
       def deliver(headers, body)
         headers = headers.merge(
           @common_headers,
-          { "Bugsnag-Sent-At" => Time.now.utc.iso8601(3) },
+        # TODO - add this back when pipeline is ready
+        #  { "Bugsnag-Sent-At" => Time.now.utc.iso8601(3) },
         )
 
         raw_response = OpenTelemetry::Common::Utilities.untraced do
