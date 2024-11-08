@@ -8,7 +8,7 @@ module BugsnagPerformance
       def initialize(configuration)
         @uri = URI(configuration.endpoint)
         @common_headers = {
-          "User-Agent" => "Ruby Bugsnag Performance SDK v#{BugsnagPerformance::VERSION}",
+          "User-Agent" => "#{BugsnagPerformance::SDK_NAME} v#{BugsnagPerformance::VERSION}",
           "Bugsnag-Api-Key" => configuration.api_key,
           "Content-Type" => "application/json",
         }.freeze

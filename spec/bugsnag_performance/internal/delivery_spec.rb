@@ -21,7 +21,7 @@ RSpec.describe BugsnagPerformance::Internal::Delivery do
             "header" => "yes",
             "Content-Type" => "application/json",
             "Bugsnag-Api-Key" => "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "User-Agent" => "Ruby Bugsnag Performance SDK v#{BugsnagPerformance::VERSION}",
+            "User-Agent" => "#{BugsnagPerformance::SDK_NAME} v#{BugsnagPerformance::VERSION}",
           }
         ).once
     end
