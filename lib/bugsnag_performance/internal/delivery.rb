@@ -8,7 +8,7 @@ module BugsnagPerformance
       def initialize(configuration)
         @uri = URI(configuration.endpoint)
         @common_headers = {
-          "User-Agent" => "Ruby Bugsnag Performance SDK v#{BugsnagPerformance::VERSION}",
+          "User-Agent" => "#{BugsnagPerformance::SDK_NAME} v#{BugsnagPerformance::VERSION}",
           "Bugsnag-Api-Key" => configuration.api_key,
           "Content-Type" => "application/json",
         }.freeze
@@ -17,7 +17,8 @@ module BugsnagPerformance
       def deliver(headers, body)
         headers = headers.merge(
           @common_headers,
-          { "Bugsnag-Sent-At" => Time.now.utc.iso8601(3) },
+        # TODO - can be restored after https://smartbear.atlassian.net/browse/PIPE-7498
+        #  { "Bugsnag-Sent-At" => Time.now.utc.iso8601(3) },
         )
 
         raw_response = OpenTelemetry::Common::Utilities.untraced do

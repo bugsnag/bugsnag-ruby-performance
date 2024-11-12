@@ -34,7 +34,7 @@ RSpec.describe BugsnagPerformance do
       expect(open_telemetry_configurator).to receive(:resource=).with(
         satisfy { |resource| resource.attribute_enumerator.to_h == { 
           "deployment.environment" => "prodevelopment",
-          "bugsnag.telemetry.sdk.name"=>"Ruby Bugsnag Performance SDK",
+          "bugsnag.telemetry.sdk.name"=>BugsnagPerformance::SDK_NAME,
           "bugsnag.telemetry.sdk.version"=>BugsnagPerformance::VERSION,
         } }
       )
@@ -68,7 +68,7 @@ RSpec.describe BugsnagPerformance do
       expect(open_telemetry_configurator).to receive(:resource=).with(
         satisfy { |resource| resource.attribute_enumerator.to_h == {
           "deployment.environment" => "prodevelopment",
-          "bugsnag.telemetry.sdk.name"=>"Ruby Bugsnag Performance SDK",
+          "bugsnag.telemetry.sdk.name"=>BugsnagPerformance::SDK_NAME,
           "bugsnag.telemetry.sdk.version"=>BugsnagPerformance::VERSION,
          } }
       )

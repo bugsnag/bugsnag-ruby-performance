@@ -86,7 +86,7 @@ module BugsnagPerformance
       otel_configurator.resource = OpenTelemetry::SDK::Resources::Resource.create(
         {
           OpenTelemetry::SemanticConventions::Resource::DEPLOYMENT_ENVIRONMENT => configuration.release_stage,
-          "bugsnag.telemetry.sdk.name" => "Ruby Bugsnag Performance SDK",
+          "bugsnag.telemetry.sdk.name" => SDK_NAME,
           "bugsnag.telemetry.sdk.version" => VERSION,
         }
       )
