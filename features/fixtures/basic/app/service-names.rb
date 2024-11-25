@@ -11,7 +11,6 @@ BugsnagPerformance.configure do |configuration|
   configuration.app_version = "1.22.333"
   configuration.enabled_release_stages = ["production", "staging"]
   configuration.release_stage = "staging"
-  configuration.service_name = "basic app"
 
   configuration.configure_open_telemetry do |otel_configurator|
     otel_configurator.resource = OpenTelemetry::SDK::Resources::Resource.create({

@@ -15,6 +15,7 @@ module BugsnagPerformance
         validate_api_key
         validate_string(:app_version, optional: true)
         validate_string(:release_stage, optional: true)
+        validate_string(:service_name, optional: true)
         validate_array(:enabled_release_stages, "non-empty strings", optional: true, &method(:valid_string?))
         valid_endpoint = validate_endpoint
 
