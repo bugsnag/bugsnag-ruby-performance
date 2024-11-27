@@ -49,6 +49,14 @@ module BugsnagPerformance
     # @return [Array<String>, nil]
     attr_accessor :enabled_release_stages
 
+    # The name of the service that is being traced
+    #
+    # If not set, this will default to the Open Telemetry SDK service name
+    # or the value set by the "OTEL_SERVICE_NAME" environment variable
+    #
+    # @return [String]
+    attr_accessor :service_name
+
     attr_writer :endpoint
 
     def initialize(errors_configuration)
@@ -58,6 +66,11 @@ module BugsnagPerformance
       @api_key = fetch(errors_configuration, :api_key, env: "BUGSNAG_PERFORMANCE_API_KEY")
       @app_version = fetch(errors_configuration, :app_version, env: "BUGSNAG_PERFORMANCE_APP_VERSION")
       @release_stage = fetch(errors_configuration, :release_stage, env: "BUGSNAG_PERFORMANCE_RELEASE_STAGE", default: "production")
+
+      service_env = ENV["BUGSNAG_PERFORMANCE_SERVICE_NAME"]
+      @service_name = service_env unless service_env.nil?
+      endpoint_env = ENV["BUGSNAG_PERFORMANCE_ENDPOINT"]
+      @endpoint = endpoint_env unless endpoint_env.nil?
 
       @enabled_release_stages = fetch(errors_configuration, :enabled_release_stages, env: "BUGSNAG_PERFORMANCE_ENABLED_RELEASE_STAGES")
 

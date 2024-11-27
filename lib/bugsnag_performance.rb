@@ -83,6 +83,11 @@ module BugsnagPerformance
         otel_configurator.service_version = app_version
       end
 
+      # set the service name if explicitly set by the user
+      if configuration.service_name != nil && configuration.service_name != ""
+        otel_configurator.service_name = configuration.service_name
+      end
+
       otel_configurator.resource = OpenTelemetry::SDK::Resources::Resource.create(
         {
           OpenTelemetry::SemanticConventions::Resource::DEPLOYMENT_ENVIRONMENT => configuration.release_stage,

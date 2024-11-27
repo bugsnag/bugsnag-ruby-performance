@@ -10,6 +10,7 @@ BugsnagPerformance.configure do |configuration|
   body = JSON.generate({
     api_key: configuration.api_key,
     release_stage: configuration.release_stage,
+    app_version: configuration.app_version,
   })
 
   Net::HTTP.post(uri, body, { 'content-type' => 'application/json' })
