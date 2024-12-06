@@ -38,8 +38,7 @@ RSpec.describe BugsnagPerformance::Internal::SpanExporter do
     expect(subject).to have_sent_trace { |headers:, **|
       expect(headers["Bugsnag-Span-Sampling"]).to eq("1.0:1")
       expect(headers["Bugsnag-Api-Key"]).to eq("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-      # TODO - can be restored after https://smartbear.atlassian.net/browse/PIPE-7498
-      #expect(headers["Bugsnag-Sent-At"]).to match(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\z/)
+      expect(headers["Bugsnag-Sent-At"]).to match(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\z/)
       expect(headers["Content-Type"]).to eq("application/json")
       expect(headers["User-Agent"]).to eq("#{BugsnagPerformance::SDK_NAME} v#{BugsnagPerformance::VERSION}")
     }
