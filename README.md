@@ -9,9 +9,9 @@
 </div>
 
 [![Documentation](https://img.shields.io/badge/documentation-latest-blue.svg)](https://docs.bugsnag.com/performance/ruby/)
-[![Build status](https://github.com/bugsnag/bugsnag-ruby-performance/actions/workflows/maze-runner.yml/badge.svg?branch=main)](https://github.com/bugsnag/bugsnag-ruby-performance/actions/workflows/maze-runner.yml)
+[![Build status](https://github.com/bugsnag/bugsnag-ruby-performance/actions/workflows/maze-runner.yml/badge.svg?branch=next)](https://github.com/bugsnag/bugsnag-ruby-performance/actions/workflows/maze-runner.yml)
 
-Convenience SDK for using the [Ruby Otel SDK](https://github.com/open-telemetry/opentelemetry-ruby) with BugSnag.
+Convenience SDK for using the [Ruby OpenTelemetry SDK](https://github.com/open-telemetry/opentelemetry-ruby) with BugSnag.
 
 ## Features
 
@@ -30,4 +30,4 @@ For integration instructions, see our online docs: [docs.bugsnag.com/performance
 
 ## License
 
-The BugSnag Ruby performance SDK is free software released under the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
+The BugSnag Ruby Performance SDK is free software released under the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
