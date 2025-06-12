@@ -18,3 +18,7 @@ maze_output
 temp-bugsnag-performance
 
 *.gem
+
+# IDEs
+.idea
+*.iml
