@@ -335,10 +335,16 @@ RSpec.describe BugsnagPerformance::Configuration do
       expect(subject.endpoint).to be_nil
     end
 
-    it "is the default URL if API key is set" do
+    it "is the default non-hub URL if a non-hub API key is set" do
       subject.api_key = "1234567890abcdef1234567890abcdef"
 
       expect(subject.endpoint).to eq("https://#{subject.api_key}.otlp.bugsnag.com/v1/traces")
+    end
+
+    it "is the default hub URL if a hub API key is set" do
+      subject.api_key = "0000067890abcdef1234567890abcdef"
+
+      expect(subject.endpoint).to eq("https://#{subject.api_key}.otlp.insighthub.smartbear.com/v1/traces")
     end
 
     it "can be set to a valid value" do
