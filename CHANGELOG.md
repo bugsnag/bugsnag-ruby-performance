@@ -1,6 +1,13 @@
 Changelog
 =========
 
+## 1.1.0 (2025-07-07)
+
+### Enhancements
+
+* Set default endpoints based on API key
+[#51](https://github.com/bugsnag/bugsnag-ruby/pull/51)
+
 ## 1.0.0 (2024-12-09)
 
 ### Enhancements
