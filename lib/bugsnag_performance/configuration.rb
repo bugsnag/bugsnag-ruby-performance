@@ -59,7 +59,7 @@ module BugsnagPerformance
 
     attr_writer :endpoint
 
-    HUB_PREFIX = "00000"
+    SECONDARY_PREFIX = "00000"
 
     def initialize(errors_configuration)
       @open_telemetry_configure_block = proc { |c| }
@@ -94,7 +94,7 @@ module BugsnagPerformance
 
     # The URL to send traces to
     #
-    # If not set this defaults to "https://<api_key>.otlp.bugsnag.com/v1/traces" or "https://<api_key>.otlp.insighthub.smartbear.com/v1/traces", depending on the API key
+    # If not set this defaults to "https://<api_key>.otlp.bugsnag.com/v1/traces" or "https://<api_key>.otlp.bugsnag.smartbear.com/v1/traces", depending on the API key
     #
     # @return [String, nil]
     def endpoint
@@ -106,8 +106,8 @@ module BugsnagPerformance
         # if there's no API key then we can't construct the default URL
         nil
       else
-        instance = if hub_api_key?
-          "insighthub.smartbear.com"
+        instance = if secondary_api_key?
+          "bugsnag.smartbear.com"
         else
           "bugsnag.com"
         end
@@ -142,8 +142,8 @@ module BugsnagPerformance
       default
     end
 
-    def hub_api_key?
-      @api_key.is_a?(String) && @api_key&.start_with?(HUB_PREFIX)
+    def secondary_api_key?
+      @api_key.is_a?(String) && @api_key&.start_with?(SECONDARY_PREFIX)
     end
   end
 end
