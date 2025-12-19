@@ -1,6 +1,13 @@
 Changelog
 =========
 
+## 1.1.1 (TBD)
+
+### Fixes
+
+* Amend secondary instance URL to bugsnag.smartbear.com
+  | [#54](https://github.com/bugsnag/bugsnag-ruby/pull/54)
+
 ## 1.1.0 (2025-07-07)
 
 ### Enhancements
