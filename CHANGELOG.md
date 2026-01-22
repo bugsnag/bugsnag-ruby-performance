@@ -1,12 +1,19 @@
 Changelog
 =========
 
+## 1.1.1 (2026-01-22)
+
+### Fixes
+
+* Amend secondary instance URL to bugsnag.smartbear.com
+  | [#54](https://github.com/bugsnag/bugsnag-ruby-performance/pull/54)
+
 ## 1.1.0 (2025-07-07)
 
 ### Enhancements
 
 * Set default endpoints based on API key
-[#51](https://github.com/bugsnag/bugsnag-ruby/pull/51)
+[#51](https://github.com/bugsnag/bugsnag-ruby-performance/pull/51)
 
 ## 1.0.0 (2024-12-09)
 
